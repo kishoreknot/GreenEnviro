@@ -1536,6 +1536,124 @@ def build_device_logs_report_pdf_bytes(
     return buf.getvalue()
 
 
+def _build_device_logs_report_xlsx_bytes(
+    rows: list[dict],
+    *,
+    frequency: str = "Raw",
+    schedule_frequency: Optional[str] = None,
+    report_range: Optional[tuple[str, str]] = None,
+    forced_timestamps: Optional[list[str]] = None,
+    forced_device_names: Optional[list[str]] = None,
+) -> bytes:
+    try:
+        import pandas as pd
+    except Exception as e:
+        raise RuntimeError("pandas is required to build Excel reports") from e
+
+    norm_rows = _normalize_report_rows(rows)
+    start_dt_obj: Optional[datetime] = None
+    if report_range and len(report_range) >= 1 and report_range[0]:
+        try:
+            start_dt_obj = datetime.strptime(report_range[0], "%Y-%m-%d %H:%M:%S")
+        except Exception:
+            try:
+                start_dt_obj = datetime.fromisoformat(str(report_range[0]))
+            except Exception:
+                start_dt_obj = None
+
+    agg_rows = _aggregate_report_rows(norm_rows, frequency, start_dt=start_dt_obj)
+    device_units: dict[str, str] = {}
+    for row in norm_rows:
+        device_units.setdefault(row["device_name"], row.get("gas_unit", "ppm"))
+    if forced_device_names:
+        for name in forced_device_names:
+            device_units.setdefault(str(name), "ppm")
+        device_names = [str(name) for name in forced_device_names]
+    else:
+        device_names = sorted(device_units.keys())
+
+    if forced_timestamps is not None:
+        timestamps = [str(ts) for ts in forced_timestamps]
+    else:
+        timestamps = sorted({str(r.get("recorded_at", "")) for r in agg_rows if r.get("recorded_at")})
+
+    pivot: dict[str, dict[str, float]] = {ts: {} for ts in timestamps}
+    for row in agg_rows:
+        ts = str(row.get("recorded_at", ""))
+        if ts not in pivot:
+            continue
+        try:
+            pivot[ts][row["device_name"]] = float(row.get("concentration_value") or 0.0)
+        except Exception:
+            continue
+
+    summary_rows: list[list[str]] = []
+    for name in device_names:
+        vals = [
+            float(row.get("concentration_value") or 0.0)
+            for row in norm_rows
+            if row["device_name"] == name
+        ]
+        unit = device_units.get(name, "ppm")
+        if vals:
+            mn = min(vals)
+            mx = max(vals)
+            avg = sum(vals) / len(vals)
+            summary_rows.append([name, unit, f"{mn:.2f}", f"{mx:.2f}", f"{avg:.2f}"])
+        else:
+            summary_rows.append([name, unit, "—", "—", "—"])
+
+    try:
+        from db_repository import get_all_plants
+        plants = get_all_plants()
+        plant = plants[0] if plants else {}
+    except Exception:
+        plant = {}
+
+    company_name = str(plant.get("company_name", "—") or "—")
+    location = str(plant.get("location", "—") or "—")
+    extracted_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if report_range and len(report_range) == 2:
+        range_str = f"{report_range[0]}  to  {report_range[1]}"
+    elif norm_rows:
+        range_str = f"{norm_rows[0]['recorded_at']}  to  {norm_rows[-1]['recorded_at']}"
+    else:
+        range_str = "—"
+    freq_str = "Raw" if str(frequency).strip().lower() in {"raw", "none"} else str(frequency)
+
+    meta_rows = [
+        ["Company Name", company_name],
+        ["Location", location],
+        ["Extracted At", extracted_at],
+        ["Report Range", range_str],
+        ["Frequency", freq_str],
+    ]
+    if schedule_frequency:
+        meta_rows.append(["Schedule", schedule_frequency])
+
+    detail_rows: list[list[str]] = []
+    for ts in timestamps:
+        row_map = pivot.get(ts, {})
+        detail_rows.append([
+            ts,
+            *[
+                f"{row_map.get(name):.2f}" if row_map.get(name) is not None else "NA"
+                for name in device_names
+            ],
+        ])
+
+    detail_header = ["Timestamp"] + device_names
+    buf = BytesIO()
+    with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+        pd.DataFrame(meta_rows, columns=["Field", "Value"]).to_excel(
+            writer, index=False, sheet_name="Report Info")
+        pd.DataFrame(summary_rows, columns=["Device", "Units", "Min", "Max", "Average"]).to_excel(
+            writer, index=False, sheet_name="Summary")
+        pd.DataFrame(detail_rows, columns=detail_header).to_excel(
+            writer, index=False, sheet_name="Detail")
+    return buf.getvalue()
+
+
 def generate_report_html(
     rows: list[dict],
     scheduler: dict,
@@ -1668,9 +1786,17 @@ def send_report(
             schedule_frequency=str(scheduler.get("frequency", "") or ""),
             report_range=report_range,
         )
+        xlsx_bytes = _build_device_logs_report_xlsx_bytes(
+            rows,
+            frequency=str(scheduler.get("avg_at", "Raw") or "Raw"),
+            schedule_frequency=str(scheduler.get("frequency", "") or ""),
+            report_range=report_range,
+            forced_timestamps=None,
+            forced_device_names=None,
+        )
     except Exception as e:
-        logger.exception("Failed to build report PDF")
-        return False, f"Failed to build report PDF: {e}"
+        logger.exception("Failed to build report attachments")
+        return False, f"Failed to build report attachments: {e}"
 
     subject = (
         f"[H2 Dashboard] Device Logs Report — {scheduler['frequency']} "
@@ -1692,10 +1818,15 @@ def send_report(
                 "utf-8",
             ))
             safe_freq = str(scheduler.get("frequency", "Report")).replace(" ", "_")
-            file_name = f"device_logs_report_{safe_freq}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+            pdf_file_name = f"device_logs_report_{safe_freq}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
             pdf_part = MIMEApplication(pdf_bytes, _subtype="pdf")
-            pdf_part.add_header("Content-Disposition", "attachment", filename=file_name)
+            pdf_part.add_header("Content-Disposition", "attachment", filename=pdf_file_name)
             msg.attach(pdf_part)
+
+            xlsx_file_name = f"device_logs_report_{safe_freq}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            xlsx_part = MIMEApplication(xlsx_bytes, _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            xlsx_part.add_header("Content-Disposition", "attachment", filename=xlsx_file_name)
+            msg.attach(xlsx_part)
 
             port = int(cfg.get("port", 587))
             sec = int(cfg.get("use_tls", 1))

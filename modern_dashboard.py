@@ -2759,6 +2759,7 @@ class DeviceLogsView(ctk.CTkFrame):
 
         for icon, title, sub, cmd in [
             ("\U0001f4c4", "Export CSV", "Comma-separated values", self._export_csv),
+            ("\U0001f4c1", "Export Excel", "Workbook with summary + detail", self._export_excel),
             ("\U0001f4cb", "Export PDF", "Formatted report", self._export_pdf),
         ]:
             row = ctk.CTkFrame(inner, fg_color="transparent", corner_radius=8)
@@ -3001,6 +3002,66 @@ class DeviceLogsView(ctk.CTkFrame):
             logger.exception("CSV export failed")
             self._info_lbl.configure(text=f"Export error: {e}",
                                      text_color=CLR_CRIT)
+
+    def _export_excel(self):
+        rows, qp = self._get_export_rows()
+        if rows is None:
+            return
+        rows = self._aggregate_for_export(rows, qp["start_dt"])
+
+        forced_timestamps = self._generate_export_timestamps(qp["start_dt"], qp["end_dt"])
+        device_cols, timestamps, pivot = self._build_export_matrix(
+            rows,
+            qp.get("selected_addrs", []),
+            forced_timestamps=forced_timestamps,
+        )
+
+        if not timestamps:
+            self._info_lbl.configure(text="No timestamps in selected range", text_color=CLR_WARN)
+            return
+
+        try:
+            import pandas as pd
+            from tkinter import filedialog
+
+            path = filedialog.asksaveasfilename(
+                defaultextension=".xlsx",
+                filetypes=[("Excel Workbook", "*.xlsx")],
+                title="Save Device Logs as Excel")
+            if not path:
+                return
+
+            detail_header = ["Timestamp"] + [name for _addr, name, _unit in device_cols]
+            detail_rows = []
+            for ts in timestamps:
+                row_map = pivot.get(ts, {})
+                row = [ts]
+                for _addr, dev_name, _unit in device_cols:
+                    val = row_map.get(dev_name)
+                    row.append(f"{val:.2f}" if val is not None else "NA")
+                detail_rows.append(row)
+
+            summary_rows = self._build_export_summary(device_cols, rows)
+            meta_rows = [
+                ["Frequency", self._export_freq_var.get()],
+                ["From", qp["start_dt"].strftime("%Y-%m-%d %H:%M:%S")],
+                ["To", qp["end_dt"].strftime("%Y-%m-%d %H:%M:%S")],
+                ["Devices", ", ".join([name for _addr, name, _unit in device_cols]) or "All"],
+            ]
+
+            with pd.ExcelWriter(path, engine="openpyxl") as writer:
+                pd.DataFrame(meta_rows, columns=["Field", "Value"]).to_excel(
+                    writer, index=False, sheet_name="Report Info")
+                pd.DataFrame(summary_rows, columns=["Device", "Units", "Min", "Max", "Average"]).to_excel(
+                    writer, index=False, sheet_name="Summary")
+                pd.DataFrame(detail_rows, columns=detail_header).to_excel(
+                    writer, index=False, sheet_name="Detail")
+
+            self._info_lbl.configure(
+                text=f"Saved: {os.path.basename(path)}", text_color=CLR_SAFE)
+        except Exception as e:
+            logger.exception("Excel export failed")
+            self._info_lbl.configure(text=f"Export error: {e}", text_color=CLR_CRIT)
 
     def _build_export_matrix(
         self,
