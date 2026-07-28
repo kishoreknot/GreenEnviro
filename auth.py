@@ -4,7 +4,7 @@ Uses SQLite + PBKDF2-HMAC-SHA256 password hashing.
 
 Default seed account (created on first run):
     username : admin
-    password : Admin@123
+    password : Admin@Him@layas
     role     : admin
 """
 
@@ -135,7 +135,7 @@ def init_auth_db() -> None:
         # Seed default admin if table is empty
         count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
         if count == 0:
-            pw_hash, pw_salt = _hash_password("Admin@123")
+            pw_hash, pw_salt = _hash_password("Admin@Him@layas")
             conn.execute(
                 """INSERT INTO users
                        (username, full_name, pw_hash, pw_salt, role, active, created_at)
