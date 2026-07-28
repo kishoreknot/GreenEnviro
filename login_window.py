@@ -197,11 +197,11 @@ class LoginWindow(ctk.CTkToplevel):
         self._login_btn.pack(fill="x", pady=(4, 0))
 
         # Footer hint
-        ctk.CTkLabel(card,
-                     text="Default: admin / Admin@123",
-                     font=(_FONT, 9),
-                     text_color=CLR_LABEL,
-                     fg_color="transparent").pack(pady=(14, 0))
+        # ctk.CTkLabel(card,
+        #              text="Default: admin / Admin@123",
+        #              font=(_FONT, 9),
+        #              text_color=CLR_LABEL,
+        #              fg_color="transparent").pack(pady=(14, 0))
 
         # Bind Enter key
         self.bind("<Return>", lambda _e: self._attempt_login())
