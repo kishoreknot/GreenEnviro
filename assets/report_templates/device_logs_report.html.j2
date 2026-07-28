@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{ title }}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 14mm;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #1f2937;
+      font-size: 11px;
+    }
+
+    .header {
+      border-bottom: 2px solid #2563eb;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin: 0;
+    }
+
+    .meta {
+      margin-top: 6px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px 12px;
+      font-size: 10px;
+      color: #475569;
+    }
+
+    .meta span {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      table-layout: fixed;
+      font-size: 10px;
+    }
+
+    thead th {
+      background: #1d4ed8;
+      color: #ffffff;
+      text-align: left;
+      padding: 7px 6px;
+      border: 1px solid #93c5fd;
+      font-weight: 700;
+    }
+
+    tbody td {
+      border: 1px solid #dbeafe;
+      padding: 6px;
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #eff6ff;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .footer {
+      margin-top: 8px;
+      font-size: 9px;
+      color: #64748b;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="title">{{ title }}</h1>
+    <div class="meta">
+      <div><span>Generated:</span> {{ generated_at }}</div>
+      <div><span>From:</span> {{ from_dt }}</div>
+      <div><span>To:</span> {{ to_dt }}</div>
+      <div><span>Devices:</span> {{ selected_devices }}</div>
+      <div><span>Aggregation:</span> {{ frequency }}</div>
+      <div><span>Rows:</span> {{ record_count }}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 18%;">Device</th>
+        <th style="width: 10%;">Concentration</th>
+        <th style="width: 10%;">Low Alarm</th>
+        <th style="width: 10%;">High Alarm</th>
+        <th style="width: 12%;">Alarm Status</th>
+        <th style="width: 8%;">Samples</th>
+        <th style="width: 18%;">Interval</th>
+        <th style="width: 14%;">Recorded At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.device }}</td>
+        <td class="right">{{ row.concentration }}</td>
+        <td class="right">{{ row.low_alarm }}</td>
+        <td class="right">{{ row.high_alarm }}</td>
+        <td>{{ row.alarm_status }}</td>
+        <td class="right">{{ row.sample_count }}</td>
+        <td>{{ row.interval }}</td>
+        <td>{{ row.recorded_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">H2 Dashboard Template PDF</div>
+</body>
+</html>
