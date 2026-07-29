@@ -3027,6 +3027,7 @@ class DeviceLogsView(ctk.CTkFrame):
             path = filedialog.asksaveasfilename(
                 defaultextension=".xlsx",
                 filetypes=[("Excel Workbook", "*.xlsx")],
+                initialfile=f"device_logs_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
                 title="Save Device Logs as Excel")
             if not path:
                 return
@@ -3038,7 +3039,7 @@ class DeviceLogsView(ctk.CTkFrame):
                 row = [ts]
                 for _addr, dev_name, _unit in device_cols:
                     val = row_map.get(dev_name)
-                    row.append(f"{val:.2f}" if val is not None else "NA")
+                    row.append(round(float(val), 2) if val is not None else "NA")
                 detail_rows.append(row)
 
             summary_rows = self._build_export_summary(device_cols, rows)
@@ -3067,6 +3068,64 @@ class DeviceLogsView(ctk.CTkFrame):
                     writer, index=False, header=False, sheet_name=workbook_sheet, startrow=detail_start - 1)
                 pd.DataFrame(detail_rows, columns=detail_header).to_excel(
                     writer, index=False, sheet_name=workbook_sheet, startrow=detail_start)
+
+                from openpyxl.styles import Alignment, Font, PatternFill
+
+                ws = writer.sheets[workbook_sheet]
+                section_fill = PatternFill(fill_type="solid", fgColor="0C4A6E")
+                section_font = Font(bold=True, color="FFFFFF")
+                header_fill = PatternFill(fill_type="solid", fgColor="1E6A8D")
+                header_font = Font(bold=True, color="FFFFFF")
+                key_font = Font(bold=True)
+
+                report_info_row = 1
+                meta_header_row = 2
+                meta_data_start_row = 3
+                meta_data_end_row = meta_data_start_row + len(meta_rows) - 1
+
+                summary_title_row = summary_start
+                summary_header_row = summary_start + 1
+                summary_data_start_row = summary_header_row + 1
+                summary_data_end_row = summary_data_start_row + len(summary_rows) - 1
+                detail_title_row = detail_start
+                detail_header_row = detail_start + 1
+                detail_data_start_row = detail_header_row + 1
+                detail_data_end_row = detail_data_start_row + len(detail_rows) - 1
+
+                for row_idx in (report_info_row, summary_title_row, detail_title_row):
+                    ws.cell(row=row_idx, column=1).font = section_font
+                    ws.cell(row=row_idx, column=1).fill = section_fill
+
+                for col_idx in (1, 2):
+                    ws.cell(row=meta_header_row, column=col_idx).font = header_font
+                    ws.cell(row=meta_header_row, column=col_idx).fill = header_fill
+                    ws.cell(row=meta_header_row, column=col_idx).alignment = Alignment(horizontal="center")
+
+                for row_idx in range(meta_data_start_row, meta_data_end_row + 1):
+                    ws.cell(row=row_idx, column=1).font = key_font
+
+                for col_idx in range(1, 6):
+                    ws.cell(row=summary_header_row, column=col_idx).font = header_font
+                    ws.cell(row=summary_header_row, column=col_idx).fill = header_fill
+                    ws.cell(row=summary_header_row, column=col_idx).alignment = Alignment(horizontal="center")
+
+                for col_idx in range(1, len(detail_header) + 1):
+                    ws.cell(row=detail_header_row, column=col_idx).font = header_font
+                    ws.cell(row=detail_header_row, column=col_idx).fill = header_fill
+                    ws.cell(row=detail_header_row, column=col_idx).alignment = Alignment(horizontal="center")
+
+                # Keep concentration/stat columns numeric in Excel for formulas/pivots.
+                for row_idx in range(summary_data_start_row, summary_data_end_row + 1):
+                    for col_idx in (3, 4, 5):
+                        cell = ws.cell(row=row_idx, column=col_idx)
+                        if isinstance(cell.value, (int, float)):
+                            cell.number_format = "0.00"
+
+                for row_idx in range(detail_data_start_row, detail_data_end_row + 1):
+                    for col_idx in range(2, len(detail_header) + 1):
+                        cell = ws.cell(row=row_idx, column=col_idx)
+                        if isinstance(cell.value, (int, float)):
+                            cell.number_format = "0.00"
 
             self._info_lbl.configure(
                 text=f"Saved: {os.path.basename(path)}", text_color=CLR_SAFE)
@@ -3121,7 +3180,7 @@ class DeviceLogsView(ctk.CTkFrame):
 
         return device_cols, timestamps, ordered_pivot
 
-    def _build_export_summary(self, device_cols: list[tuple[int, str, str]], rows: list[dict]) -> list[list[str]]:
+    def _build_export_summary(self, device_cols: list[tuple[int, str, str]], rows: list[dict]) -> list[list[object]]:
         """Build summary rows: Device, Units, Min, Max, Average."""
         values_by_name: dict[str, list[float]] = {name: [] for _addr, name, _unit in device_cols}
         unit_by_name: dict[str, str] = {name: unit for _addr, name, unit in device_cols}
@@ -3135,7 +3194,7 @@ class DeviceLogsView(ctk.CTkFrame):
             except Exception:
                 continue
 
-        summary_rows: list[list[str]] = []
+        summary_rows: list[list[object]] = []
         for _addr, name, unit in device_cols:
             vals = values_by_name.get(name, [])
             if vals:
@@ -3145,9 +3204,9 @@ class DeviceLogsView(ctk.CTkFrame):
                 summary_rows.append([
                     name,
                     unit_by_name.get(name, unit),
-                    f"{mn:.2f}",
-                    f"{mx:.2f}",
-                    f"{avg:.2f}",
+                    round(mn, 2),
+                    round(mx, 2),
+                    round(avg, 2),
                 ])
             else:
                 summary_rows.append([name, unit_by_name.get(name, unit), "—", "—", "—"])

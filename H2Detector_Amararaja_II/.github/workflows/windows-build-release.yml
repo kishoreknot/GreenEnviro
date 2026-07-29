@@ -1,0 +1,95 @@
+# name: Windows Build and Release
+
+# on:
+#   pull_request:
+#     branches:
+#       - main
+#   push:
+#     branches:
+#       - main
+#     tags:
+#       - "v*"
+#   workflow_dispatch:
+
+# permissions:
+#   contents: read
+
+# jobs:
+#   build-package:
+#     name: Build EXEs and Package Deploy Bundle
+#     runs-on: windows-latest
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.11"
+
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
+
+#       - name: Compile sanity check
+#         run: |
+#           python -m py_compile modern_dashboard.py
+#           python -m py_compile alert_manager.py
+#           python -m py_compile h2_background_service.py
+#           python -m py_compile h2_native_windows_service.py
+
+#       - name: Build dashboard EXE
+#         run: pyinstaller modern_dashboard.spec --noconfirm --clean --distpath dist --workpath build
+
+#       - name: Build native service EXE
+#         run: pyinstaller h2_native_windows_service.spec --noconfirm --clean --distpath dist --workpath build
+
+#       - name: Package deployment bundle
+#         id: pack
+#         shell: pwsh
+#         run: |
+#           $bundleRoot = "package/H2Detector"
+#           New-Item -ItemType Directory -Path $bundleRoot -Force | Out-Null
+
+#           Copy-Item "dist/H2_Dashboard.exe" "$bundleRoot/H2_Dashboard.exe" -Force
+#           Copy-Item "dist/H2_BackgroundWindowsService.exe" "$bundleRoot/H2_BackgroundWindowsService.exe" -Force
+#           Copy-Item "deploy_h2_native_service.ps1" "$bundleRoot/deploy_h2_native_service.ps1" -Force
+#           Copy-Item "install_h2_native_service.ps1" "$bundleRoot/install_h2_native_service.ps1" -Force
+
+#           $safeRef = "${{ github.ref_name }}" -replace "[^A-Za-z0-9._-]", "_"
+#           $bundleName = "H2Detector_${safeRef}_${{ github.run_number }}"
+#           $zipPath = "out/$bundleName.zip"
+#           New-Item -ItemType Directory -Path "out" -Force | Out-Null
+#           Compress-Archive -Path "$bundleRoot/*" -DestinationPath $zipPath -Force
+
+#           "bundle_zip=$zipPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+#       - name: Upload deployment bundle artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: h2detector-deploy-bundle
+#           path: ${{ steps.pack.outputs.bundle_zip }}
+#           if-no-files-found: error
+
+#   release:
+#     name: Publish GitHub Release
+#     needs: build-package
+#     if: startsWith(github.ref, 'refs/tags/v')
+#     permissions:
+#       contents: write
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Download deployment bundle artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: h2detector-deploy-bundle
+#           path: out
+
+#       - name: Create release and upload bundle
+#         uses: softprops/action-gh-release@v2
+#         with:
+#           files: out/*.zip
+#           generate_release_notes: true
