@@ -3049,13 +3049,24 @@ class DeviceLogsView(ctk.CTkFrame):
                 ["Devices", ", ".join([name for _addr, name, _unit in device_cols]) or "All"],
             ]
 
+            workbook_sheet = "Device Logs"
             with pd.ExcelWriter(path, engine="openpyxl") as writer:
                 pd.DataFrame(meta_rows, columns=["Field", "Value"]).to_excel(
-                    writer, index=False, sheet_name="Report Info")
+                    writer, index=False, sheet_name=workbook_sheet, startrow=1)
+                pd.DataFrame([['Report Info']]).to_excel(
+                    writer, index=False, header=False, sheet_name=workbook_sheet, startrow=0)
+
+                summary_start = len(meta_rows) + 3
+                pd.DataFrame([['Summary']]).to_excel(
+                    writer, index=False, header=False, sheet_name=workbook_sheet, startrow=summary_start - 1)
                 pd.DataFrame(summary_rows, columns=["Device", "Units", "Min", "Max", "Average"]).to_excel(
-                    writer, index=False, sheet_name="Summary")
+                    writer, index=False, sheet_name=workbook_sheet, startrow=summary_start)
+
+                detail_start = summary_start + len(summary_rows) + 3
+                pd.DataFrame([['Detail']]).to_excel(
+                    writer, index=False, header=False, sheet_name=workbook_sheet, startrow=detail_start - 1)
                 pd.DataFrame(detail_rows, columns=detail_header).to_excel(
-                    writer, index=False, sheet_name="Detail")
+                    writer, index=False, sheet_name=workbook_sheet, startrow=detail_start)
 
             self._info_lbl.configure(
                 text=f"Saved: {os.path.basename(path)}", text_color=CLR_SAFE)
