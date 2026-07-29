@@ -1643,14 +1643,25 @@ def _build_device_logs_report_xlsx_bytes(
         ])
 
     detail_header = ["Timestamp"] + device_names
+    workbook_sheet = "Device Logs"
     buf = BytesIO()
     with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+        pd.DataFrame([['Report Info']]).to_excel(
+            writer, index=False, header=False, sheet_name=workbook_sheet, startrow=0)
         pd.DataFrame(meta_rows, columns=["Field", "Value"]).to_excel(
-            writer, index=False, sheet_name="Report Info")
+            writer, index=False, sheet_name=workbook_sheet, startrow=1)
+
+        summary_start = len(meta_rows) + 3
+        pd.DataFrame([['Summary']]).to_excel(
+            writer, index=False, header=False, sheet_name=workbook_sheet, startrow=summary_start - 1)
         pd.DataFrame(summary_rows, columns=["Device", "Units", "Min", "Max", "Average"]).to_excel(
-            writer, index=False, sheet_name="Summary")
+            writer, index=False, sheet_name=workbook_sheet, startrow=summary_start)
+
+        detail_start = summary_start + len(summary_rows) + 3
+        pd.DataFrame([['Detail']]).to_excel(
+            writer, index=False, header=False, sheet_name=workbook_sheet, startrow=detail_start - 1)
         pd.DataFrame(detail_rows, columns=detail_header).to_excel(
-            writer, index=False, sheet_name="Detail")
+            writer, index=False, sheet_name=workbook_sheet, startrow=detail_start)
     return buf.getvalue()
 
 
