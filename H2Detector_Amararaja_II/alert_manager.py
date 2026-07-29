@@ -1587,7 +1587,7 @@ def _build_device_logs_report_xlsx_bytes(
         except Exception:
             continue
 
-    summary_rows: list[list[str]] = []
+    summary_rows: list[list[object]] = []
     for name in device_names:
         vals = [
             float(row.get("concentration_value") or 0.0)
@@ -1599,7 +1599,7 @@ def _build_device_logs_report_xlsx_bytes(
             mn = min(vals)
             mx = max(vals)
             avg = sum(vals) / len(vals)
-            summary_rows.append([name, unit, f"{mn:.2f}", f"{mx:.2f}", f"{avg:.2f}"])
+            summary_rows.append([name, unit, round(mn, 2), round(mx, 2), round(avg, 2)])
         else:
             summary_rows.append([name, unit, "—", "—", "—"])
 
@@ -1631,13 +1631,13 @@ def _build_device_logs_report_xlsx_bytes(
     if schedule_frequency:
         meta_rows.append(["Schedule", schedule_frequency])
 
-    detail_rows: list[list[str]] = []
+    detail_rows: list[list[object]] = []
     for ts in timestamps:
         row_map = pivot.get(ts, {})
         detail_rows.append([
             ts,
             *[
-                f"{row_map.get(name):.2f}" if row_map.get(name) is not None else "NA"
+                round(float(row_map.get(name)), 2) if row_map.get(name) is not None else "NA"
                 for name in device_names
             ],
         ])
@@ -1662,6 +1662,64 @@ def _build_device_logs_report_xlsx_bytes(
             writer, index=False, header=False, sheet_name=workbook_sheet, startrow=detail_start - 1)
         pd.DataFrame(detail_rows, columns=detail_header).to_excel(
             writer, index=False, sheet_name=workbook_sheet, startrow=detail_start)
+
+        from openpyxl.styles import Alignment, Font, PatternFill
+
+        ws = writer.sheets[workbook_sheet]
+        section_fill = PatternFill(fill_type="solid", fgColor="0C4A6E")
+        section_font = Font(bold=True, color="FFFFFF")
+        header_fill = PatternFill(fill_type="solid", fgColor="1E6A8D")
+        header_font = Font(bold=True, color="FFFFFF")
+        key_font = Font(bold=True)
+
+        report_info_row = 1
+        meta_header_row = 2
+        meta_data_start_row = 3
+        meta_data_end_row = meta_data_start_row + len(meta_rows) - 1
+
+        summary_title_row = summary_start
+        summary_header_row = summary_start + 1
+        summary_data_start_row = summary_header_row + 1
+        summary_data_end_row = summary_data_start_row + len(summary_rows) - 1
+        detail_title_row = detail_start
+        detail_header_row = detail_start + 1
+        detail_data_start_row = detail_header_row + 1
+        detail_data_end_row = detail_data_start_row + len(detail_rows) - 1
+
+        for row_idx in (report_info_row, summary_title_row, detail_title_row):
+            ws.cell(row=row_idx, column=1).font = section_font
+            ws.cell(row=row_idx, column=1).fill = section_fill
+
+        for col_idx in (1, 2):
+            ws.cell(row=meta_header_row, column=col_idx).font = header_font
+            ws.cell(row=meta_header_row, column=col_idx).fill = header_fill
+            ws.cell(row=meta_header_row, column=col_idx).alignment = Alignment(horizontal="center")
+
+        for row_idx in range(meta_data_start_row, meta_data_end_row + 1):
+            ws.cell(row=row_idx, column=1).font = key_font
+
+        for col_idx in range(1, 6):
+            ws.cell(row=summary_header_row, column=col_idx).font = header_font
+            ws.cell(row=summary_header_row, column=col_idx).fill = header_fill
+            ws.cell(row=summary_header_row, column=col_idx).alignment = Alignment(horizontal="center")
+
+        for col_idx in range(1, len(detail_header) + 1):
+            ws.cell(row=detail_header_row, column=col_idx).font = header_font
+            ws.cell(row=detail_header_row, column=col_idx).fill = header_fill
+            ws.cell(row=detail_header_row, column=col_idx).alignment = Alignment(horizontal="center")
+
+        # Keep concentration/stat columns numeric in Excel for formulas/pivots.
+        for row_idx in range(summary_data_start_row, summary_data_end_row + 1):
+            for col_idx in (3, 4, 5):
+                cell = ws.cell(row=row_idx, column=col_idx)
+                if isinstance(cell.value, (int, float)):
+                    cell.number_format = "0.00"
+
+        for row_idx in range(detail_data_start_row, detail_data_end_row + 1):
+            for col_idx in range(2, len(detail_header) + 1):
+                cell = ws.cell(row=row_idx, column=col_idx)
+                if isinstance(cell.value, (int, float)):
+                    cell.number_format = "0.00"
     return buf.getvalue()
 
 

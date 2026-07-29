@@ -51,6 +51,58 @@ Do not ship:
 - `build/` artifacts
 - Development databases from local machine
 
+## CI/CD Pipeline (GitHub Actions)
+
+This repository now includes a workflow at [H2Detector_Amararaja_II/.github/workflows/windows-build-release.yml](H2Detector_Amararaja_II/.github/workflows/windows-build-release.yml) that automates your current manual build/package flow.
+
+### What it does
+
+On pull requests to `main`:
+
+- Installs dependencies
+- Runs Python compile checks
+- Builds:
+  - `dist/H2_Dashboard.exe`
+  - `dist/H2_BackgroundWindowsService.exe`
+- Packages the client deployment bundle as a zip artifact containing:
+  - `H2_Dashboard.exe`
+  - `H2_BackgroundWindowsService.exe`
+  - `deploy_h2_native_service.ps1`
+  - `install_h2_native_service.ps1`
+
+On pushes to `main`:
+
+- Runs the same build + package flow
+- Uploads the deployment bundle as a workflow artifact
+
+On version tags like `v1.2.0`:
+
+- Runs the same build + package flow
+- Publishes a GitHub Release with the deployment zip attached
+
+### How to use
+
+1. Continue your normal branch workflow (`push` -> `PR` -> `merge`).
+2. Open the Actions tab and download `h2detector-deploy-bundle` from the run.
+3. Unzip on client machine and run as admin:
+
+```powershell
+PowerShell -ExecutionPolicy Bypass -File .\deploy_h2_native_service.ps1
+```
+
+### Release flow (recommended)
+
+To create a production release artifact:
+
+```bash
+git checkout main
+git pull
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Then download the attached zip from the GitHub Release page.
+
 ## Client Installation Steps
 
 ### Prerequisites
