@@ -240,6 +240,6 @@ def _seed_default_plant(conn) -> None:
             INSERT INTO plant_master (plant_name, company_name, location)
             VALUES (?, ?, ?)
             """,
-            ("Default Plant", "Amara Raja Batteries", "Chittoor"),
+            ("Default Plant", "Amararaja", "Chittoor"),
         )
         logger.info("Default plant record seeded into plant_master.")

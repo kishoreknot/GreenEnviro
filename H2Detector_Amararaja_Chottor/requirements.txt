@@ -1,0 +1,12 @@
+customtkinter
+pymodbus
+minimalmodbus
+matplotlib
+pandas
+reportlab
+
+
+# Only for build purposes, not needed for development
+pyinstaller
+pyarmor
+pywin32

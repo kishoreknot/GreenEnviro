@@ -3042,7 +3042,7 @@ class DeviceLogsView(ctk.CTkFrame):
                     row.append(round(float(val), 2) if val is not None else "NA")
                 detail_rows.append(row)
 
-            summary_rows = self._build_export_summary(device_cols, pivot, timestamps)
+            summary_rows = self._build_export_summary(device_cols, rows)
             meta_rows = [
                 ["Frequency", self._export_freq_var.get()],
                 ["From", qp["start_dt"].strftime("%Y-%m-%d %H:%M:%S")],
@@ -3057,7 +3057,7 @@ class DeviceLogsView(ctk.CTkFrame):
                 pd.DataFrame([['Report Info']]).to_excel(
                     writer, index=False, header=False, sheet_name=workbook_sheet, startrow=0)
 
-                summary_start = len(meta_rows) + 4
+                summary_start = len(meta_rows) + 3
                 pd.DataFrame([['Summary']]).to_excel(
                     writer, index=False, header=False, sheet_name=workbook_sheet, startrow=summary_start - 1)
                 pd.DataFrame(summary_rows, columns=["Device", "Units", "Min", "Max", "Average"]).to_excel(
@@ -3180,34 +3180,36 @@ class DeviceLogsView(ctk.CTkFrame):
 
         return device_cols, timestamps, ordered_pivot
 
-    def _build_export_summary(
-        self,
-        device_cols: list[tuple[int, str, str]],
-        pivot: dict[str, dict[str, float]],
-        timestamps: list[str],
-    ) -> list[list[object]]:
-        """Build summary rows from the same aggregated values shown in Detail."""
+    def _build_export_summary(self, device_cols: list[tuple[int, str, str]], rows: list[dict]) -> list[list[object]]:
+        """Build summary rows: Device, Units, Min, Max, Average."""
+        values_by_name: dict[str, list[float]] = {name: [] for _addr, name, _unit in device_cols}
+        unit_by_name: dict[str, str] = {name: unit for _addr, name, unit in device_cols}
+
+        for row in rows:
+            name = str(row.get("_dev_name", "") or "")
+            if name not in values_by_name:
+                continue
+            try:
+                values_by_name[name].append(float(row.get("concentration_value") or 0.0))
+            except Exception:
+                continue
+
         summary_rows: list[list[object]] = []
         for _addr, name, unit in device_cols:
-            vals: list[float] = []
-            for ts in timestamps:
-                val = pivot.get(ts, {}).get(name)
-                if isinstance(val, (int, float)):
-                    vals.append(float(val))
-
+            vals = values_by_name.get(name, [])
             if vals:
                 mn = min(vals)
                 mx = max(vals)
                 avg = sum(vals) / len(vals)
                 summary_rows.append([
                     name,
-                    unit,
+                    unit_by_name.get(name, unit),
                     round(mn, 2),
                     round(mx, 2),
                     round(avg, 2),
                 ])
             else:
-                summary_rows.append([name, unit, "—", "—", "—"])
+                summary_rows.append([name, unit_by_name.get(name, unit), "—", "—", "—"])
 
         return summary_rows
 

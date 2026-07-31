@@ -1,0 +1,848 @@
+# Project Metadata & Flow Map
+
+Generated from static AST metadata across top-level Python files.
+
+## Modules
+
+- __init__.py
+- alert_manager.py
+- auth.py
+- db_connection.py
+- db_repository.py
+- db_schema.py
+- h2_background_service.py
+- h2_native_windows_service.py
+- login_window.py
+- modern_dashboard.py
+
+## Import Dependency Map
+
+- **alert_manager.py** -> db_repository.py
+- **db_repository.py** -> db_connection.py, db_schema.py
+- **db_schema.py** -> db_connection.py
+- **h2_background_service.py** -> alert_manager.py, db_repository.py, db_schema.py
+- **h2_native_windows_service.py** -> h2_background_service.py
+- **login_window.py** -> alert_manager.py, auth.py
+- **modern_dashboard.py** -> alert_manager.py, auth.py, db_connection.py, db_repository.py, db_schema.py, login_window.py
+
+## Function & Method Inventory (by file)
+
+### __init__.py
+- No functions/methods found
+
+### alert_manager.py
+- `_resolve_alert_data_dir` (line 37) calls: abspath, dirname, expanduser, get, getattr, join, strip
+- `_invalidate_cache` (line 81) calls: None
+- `_get_cached_rules` (line 88) calls: get_alert_rules, list, time
+- `init_alert_db` (line 135) calls: _connect, _ensure_alert_fire_log_alert_type, _ensure_report_scheduler_avg_at, _ensure_report_scheduler_schedule_fields, close, commit, executescript, info
+- `get_report_schedulers` (line 226) calls: _connect, _ensure_report_scheduler_avg_at, _ensure_report_scheduler_schedule_fields, append, close, exception, execute, fetchall
+- `add_report_scheduler` (line 266) calls: _connect, _ensure_report_scheduler_avg_at, _ensure_report_scheduler_schedule_fields, _parse_scheduled_time, _valid_email, close, commit, exception, execute, fetchone, log_journal, lower, str, strip
+- `add_report_scheduler_email` (line 326) calls: _connect, _valid_email, close, commit, exception, execute, log_journal, lower, str, strip
+- `delete_report_scheduler_email` (line 358) calls: _connect, close, commit, exception, execute, log_journal, lower, str, strip
+- `delete_report_scheduler` (line 387) calls: _connect, close, commit, exception, execute, log_journal, str
+- `_connect` (line 419) calls: connect, execute
+- `_ensure_report_scheduler_avg_at` (line 426) calls: commit, exception, execute, fetchall, info
+- `_ensure_report_scheduler_schedule_fields` (line 440) calls: commit, exception, execute, fetchall, info
+- `_parse_scheduled_time` (line 460) calls: str, strip, strptime
+- `_parse_db_datetime` (line 470) calls: fromisoformat, replace, str, strip, strptime
+- `_monthly_anchor` (line 485) calls: datetime, int, max, min, monthrange
+- `_add_months` (line 490) calls: datetime, int, max, min, monthrange
+- `_current_occurrence` (line 497) calls: _add_months, _monthly_anchor, lower, replace, str, strip, timedelta, weekday
+- `_mark_report_scheduler_sent` (line 527) calls: _connect, close, commit, execute, int, strftime
+- `run_pending_scheduled_reports` (line 540) calls: _current_occurrence, _mark_report_scheduler_sent, _parse_db_datetime, _parse_scheduled_time, exception, get, get_all_readings_in_range, get_report_schedulers, int, now, send_report, str, strftime, strip, timedelta
+- `_ensure_alert_fire_log_alert_type` (line 597) calls: commit, exception, execute, fetchall, info
+- `_insert_alert_fire_log` (line 611) calls: _connect, _ensure_alert_fire_log_alert_type, close, commit, execute, join
+- `_get_last_alert_fire_epoch` (line 636) calls: _connect, _ensure_alert_fire_log_alert_type, close, exception, execute, fetchone, float, int
+- `_valid_email` (line 687) calls: len, split, strip
+- `log_journal` (line 697) calls: _connect, close, commit, exception, execute
+- `get_journal` (line 716) calls: JournalEntry, _connect, close, exception, execute, fetchall
+- `get_smtp_config` (line 748) calls: _connect, close, dict, exception, execute, fetchone
+- `save_smtp_config` (line 765) calls: _connect, close, commit, exception, execute, int, log_journal, replace, str, strip
+- `get_alert_rules` (line 804) calls: AlertRule, _connect, append, close, exception, execute, fetchall
+- `add_alert` (line 846) calls: _connect, _invalidate_cache, _valid_email, close, commit, exception, execute, fetchone, log_journal, lower, str, strip
+- `update_rule_occurrence` (line 941) calls: _connect, _invalidate_cache, close, commit, exception, execute, fetchone, log_journal, str
+- `delete_alert_email` (line 976) calls: _connect, _invalidate_cache, close, commit, exception, execute, fetchone, log_journal, str
+- `delete_alert_rule` (line 1024) calls: _connect, _invalidate_cache, close, commit, exception, execute, fetchone, log_journal, str
+- `check_and_fire` (line 1067) calls: Thread, _get_cached_rules, _get_last_alert_fire_epoch, add, get, int, start, time
+- `_send_alert` (line 1108) calls: Header, MIMEMultipart, MIMEText, SMTP, SMTP_SSL, _insert_alert_fire_log, append, as_string, attach, create_default_context, discard, ehlo, exception, fromtimestamp, get, get_smtp_config, int, join, login, now, quit, sendmail, split, starttls, strftime, strip, warning
+- `_normalize_report_rows` (line 1207) calls: append, float, fromisoformat, get, int, replace, sort, str, strftime, strptime
+- `_aggregate_report_rows` (line 1245) calls: append, float, fromtimestamp, get, int, list, lower, max, setdefault, sort, str, strftime, strip, timestamp, values
+- `build_device_logs_report_pdf_bytes` (line 1292) calls: BytesIO, HRFlowable, HexColor, Paragraph, ParagraphStyle, SimpleDocTemplate, Spacer, Table, TableStyle, _aggregate_report_rows, _normalize_report_rows, append, build, extend, float, get, getSampleStyleSheet, get_all_plants, getvalue, keys, landscape, len, lower, max, min, now, setStyle, setdefault, sorted, str, strftime, strip, sum
+- `generate_report_html` (line 1507) calls: enumerate, float, get, len, now, str, strftime
+- `send_report` (line 1583) calls: Header, MIMEApplication, MIMEMultipart, MIMEText, SMTP, SMTP_SSL, _connect, _ensure_report_scheduler_avg_at, add_header, append, as_string, attach, build_device_logs_report_pdf_bytes, close, create_default_context, ehlo, exception, execute, fetchall, fetchone, get, get_smtp_config, int, join, len, log_journal, login, now, quit, replace, sendmail, split, starttls, str, strftime, strip, warning
+- `check_and_fire_offline_alert` (line 1721) calls: Thread, _get_cached_rules, _get_last_alert_fire_epoch, add, debug, exception, get, get_offline_alert_config, list, set, start, time, update, update_offline_alert_timestamp, warning
+- `_send_offline_alert` (line 1787) calls: Header, MIMEMultipart, MIMEText, SMTP, SMTP_SSL, _insert_alert_fire_log, append, as_string, attach, create_default_context, discard, ehlo, exception, fromtimestamp, get, get_smtp_config, info, int, join, len, login, now, quit, sendmail, split, starttls, strftime, strip, warning
+
+### auth.py
+- `_resolve_auth_data_dir` (line 23) calls: abspath, dirname, expanduser, get, getattr, join, strip
+- `User.display_name` (line 65) calls: strip
+- `User.is_admin` (line 69) calls: None
+- `_hash_password` (line 77) calls: encode, hex, pbkdf2_hmac, token_hex
+- `_verify_password` (line 90) calls: _hash_password, compare_digest
+- `_get_conn` (line 96) calls: connect, execute
+- `_row_to_user` (line 104) calls: User, bool
+- `init_auth_db` (line 119) calls: _get_conn, _hash_password, execute, fetchone, info, isoformat, now
+- `authenticate` (line 149) calls: _get_conn, _row_to_user, _verify_password, exception, execute, fetchone, strip
+- `list_users` (line 172) calls: _get_conn, _row_to_user, exception, execute, fetchall
+- `create_user` (line 185) calls: _get_conn, _hash_password, exception, execute, isoformat, len, now, str, strip
+- `update_user` (line 217) calls: _get_conn, bool, exception, execute, fetchone, int, str, strip
+- `delete_user` (line 246) calls: _get_conn, exception, execute, fetchone, str
+- `change_password` (line 271) calls: _get_conn, _hash_password, exception, execute, len, str
+- `reset_user_password_for_recovery` (line 288) calls: _get_conn, _hash_password, exception, execute, fetchone, int, lower, str, strip, token_hex
+
+### db_connection.py
+- `_resolve_data_dir` (line 20) calls: Path, expanduser, get, getattr, resolve, strip
+- `get_connection` (line 72) calls: commit, connect, exception, execute, info, str
+- `close_connection` (line 101) calls: close, exception, info
+
+### db_repository.py
+- `_ensure_offline_alert_table` (line 25) calls: execute, fetchone, get_connection, initialise_schema, lower, str, warning
+- `get_default_plant_id` (line 46) calls: RuntimeError, execute, fetchone, get_connection
+- `get_all_plants` (line 62) calls: dict, execute, fetchall, get_connection
+- `upsert_plant` (line 71) calls: exception, execute, fetchone, get_connection, info
+- `upsert_device` (line 105) calls: debug, exception, execute, fetchone, get_connection, info, int
+- `get_device_name` (line 182) calls: exception, execute, fetchone, get_connection
+- `rename_device` (line 196) calls: ValueError, debug, exception, execute, fetchone, get_connection, strip
+- `get_all_devices` (line 230) calls: dict, execute, fetchall, get_connection
+- `get_device_by_address` (line 259) calls: dict, execute, fetchone, get_connection
+- `upsert_k_factor_rule` (line 269) calls: bool, execute, fetchone, float, get_connection
+- `get_k_factor_rules` (line 306) calls: dict, execute, fetchall, get_connection
+- `delete_k_factor_rule` (line 328) calls: execute, get_connection
+- `get_k_factor_for_device_address` (line 335) calls: execute, fetchone, float, get_connection, int
+- `set_device_status_flag` (line 360) calls: execute, get_connection
+- `apply_scan_status_flags` (line 375) calls: execute, get_connection, join, len, sorted
+- `insert_reading` (line 407) calls: debug, exception, execute, get_connection
+- `get_readings_for_device` (line 453) calls: dict, execute, fetchall, get_connection
+- `get_readings_in_range` (line 472) calls: dict, execute, fetchall, get_connection, strftime
+- `get_all_readings_in_range` (line 496) calls: append, dict, execute, fetchall, get_connection, pop, strftime
+- `count_readings_in_range` (line 529) calls: execute, fetchone, get_connection, strftime
+- `count_all_readings_in_range` (line 549) calls: execute, fetchone, get_connection, strftime
+- `count_readings_for_devices_in_range` (line 565) calls: execute, fetchone, get_connection, join, len, strftime
+- `count_distinct_recorded_at_in_range` (line 588) calls: execute, fetchone, get_connection, join, len, strftime
+- `get_device_logs_matrix_page` (line 625) calls: dict, execute, fetchall, get_connection, join, len, str, strftime
+- `get_readings_in_range_paged` (line 715) calls: dict, execute, fetchall, get_connection, strftime
+- `get_all_readings_in_range_paged` (line 740) calls: append, dict, execute, fetchall, get_connection, pop, strftime
+- `get_readings_for_devices_in_range` (line 772) calls: append, dict, execute, fetchall, get_connection, join, len, pop, strftime
+- `get_readings_for_devices_in_range_paged` (line 803) calls: append, dict, execute, fetchall, get_connection, join, len, pop, strftime
+- `get_latest_reading` (line 838) calls: dict, execute, fetchone, get_connection
+- `get_all_latest_transaction_readings` (line 854) calls: dict, execute, fetchall, get_connection
+- `purge_old_readings` (line 888) calls: exception, execute, get_connection, info
+- `insert_live_cache_reading` (line 920) calls: exception, execute, get_connection
+- `get_live_cache_recent` (line 975) calls: dict, execute, fetchall, get_connection
+- `get_all_live_cache_latest` (line 991) calls: dict, execute, fetchall, get_connection
+- `upsert_live_reading` (line 1023) calls: insert_live_cache_reading
+- `get_all_live_readings` (line 1037) calls: get_all_live_cache_latest
+- `get_live_reading` (line 1041) calls: get_live_cache_recent
+- `get_offline_alert_config` (line 1049) calls: _ensure_offline_alert_table, dict, execute, fetchone, get_connection
+- `update_offline_alert_config` (line 1067) calls: _ensure_offline_alert_table, execute, get_connection
+- `update_offline_alert_timestamp` (line 1082) calls: _ensure_offline_alert_table, execute, get_connection
+
+### db_schema.py
+- `_get_applied_version` (line 145) calls: execute, fetchone
+- `_mark_version` (line 152) calls: execute
+- `initialise_schema` (line 162) calls: _get_applied_version, _mark_version, _seed_default_plant, exception, execute, fetchall, get_connection, info
+- `_seed_default_plant` (line 234) calls: execute, fetchone, info
+
+### h2_background_service.py
+- `_acquire_single_instance_lock` (line 33) calls: CreateMutexW, GetLastError
+- `crc16_modbus` (line 89) calls: range
+- `build_scan_command` (line 98) calls: bytes, crc16_modbus, pack
+- `parse_device_response` (line 104) calls: crc16_modbus, get, len, round, unpack_from
+- `MockScanner.__init__` (line 141) calls: round, uniform
+- `MockScanner.scan` (line 149) calls: _make_fake_response, append, enumerate, len, on_progress, parse_device_response, round, sleep
+- `MockScanner.poll_device` (line 165) calls: _make_fake_response, max, min, parse_device_response, round, uniform
+- `MockScanner.close` (line 177) calls: None
+- `MockScanner._make_fake_response` (line 180) calls: bytes, crc16_modbus, int, pack
+- `RS485Scanner.__init__` (line 203) calls: None
+- `RS485Scanner.open` (line 209) calls: Serial
+- `RS485Scanner.close` (line 219) calls: close
+- `RS485Scanner.scan` (line 223) calls: append, build_scan_command, debug, hex, len, on_progress, parse_device_response, range, read, reset_input_buffer, write
+- `RS485Scanner.poll_device` (line 242) calls: build_scan_command, len, parse_device_response, read, reset_input_buffer, write
+- `BackgroundPollingService.__init__` (line 267) calls: Event, set
+- `BackgroundPollingService.start` (line 277) calls: MockScanner, RS485Scanner, RuntimeError, _poll_once, _shutdown, _sync_devices_from_scan, exception, float, get_default_plant_id, info, init_alert_db, initialise_schema, int, is_set, max, min, open, run_pending_scheduled_reports, time, upper, wait
+- `BackgroundPollingService.stop` (line 333) calls: set
+- `BackgroundPollingService._sync_devices_from_scan` (line 336) calls: add, apply_scan_status_flags, check_and_fire_offline_alert, copy, debug, exception, get, get_all_devices, get_device_name, info, int, items, keys, len, poll_device, range, scan, set, setdefault, sleep, sorted, str, upsert_device, warning
+- `BackgroundPollingService._poll_once` (line 444) calls: check_and_fire, debug, exception, float, fromtimestamp, get, get_k_factor_for_device_address, insert_reading, int, max, now, poll_device, round, strftime, upsert_live_reading
+- `BackgroundPollingService._shutdown` (line 529) calls: close, exception, hasattr
+- `build_arg_parser` (line 537) calls: ArgumentParser, add_argument
+- `configure_service_logging` (line 555) calls: basicConfig, getattr, upper
+- `main` (line 562) calls: BackgroundPollingService, ServiceConfig, _acquire_single_instance_lock, build_arg_parser, configure_service_logging, error, exception, exit, info, parse_args, start, stop
+
+### h2_native_windows_service.py
+- `_resolve_service_data_dir` (line 33) calls: Path, expanduser, get, resolve, strip
+- `_service_config_path` (line 42) calls: _resolve_service_data_dir, mkdir
+- `_default_service_settings` (line 48) calls: build_arg_parser, parse_args, vars
+- `_load_runtime_settings` (line 53) calls: ServiceConfig, ValueError, _default_service_settings, _service_config_path, dumps, exists, float, get, int, isinstance, loads, read_text, str, update, write_text
+- `H2BackgroundWindowsService.__init__` (line 83) calls: CreateEvent, __init__, super
+- `H2BackgroundWindowsService.SvcStop` (line 88) calls: ReportServiceStatus, SetEvent, info, stop
+- `H2BackgroundWindowsService.SvcDoRun` (line 95) calls: BackgroundPollingService, LogErrorMsg, LogInfoMsg, SetEvent, _load_runtime_settings, configure_service_logging, exception, start
+- `main` (line 115) calls: HandleCommandLine, Initialize, PrepareToHostSingle, StartServiceCtrlDispatcher, len
+
+### login_window.py
+- `_logo_image` (line 28) calls: CTkImage, abspath, convert, dirname, join, open, resize
+- `LoginWindow.__init__` (line 49) calls: __init__, _build, super
+- `LoginWindow._build` (line 56) calls: BooleanVar, CTkButton, CTkCheckBox, CTkEntry, CTkFrame, CTkLabel, _attempt_login, _logo_image, bind, configure, deiconify, focus_force, focus_set, geometry, init_auth_db, lift, pack, place, protocol, resizable, title, update_idletasks, winfo_screenheight, winfo_screenwidth, withdraw
+- `LoginWindow._toggle_pw` (line 212) calls: configure, get
+- `LoginWindow._toast` (line 216) calls: CTkFrame, CTkLabel, CTkToplevel, after, attributes, destroy, geometry, overrideredirect, pack, update_idletasks, winfo_exists, winfo_height, winfo_reqheight, winfo_reqwidth, winfo_rootx, winfo_rooty, winfo_width
+- `LoginWindow._forgot_password` (line 235) calls: Thread, _ask_username_for_reset, configure, start
+- `LoginWindow._worker` (line 242) calls: EmailMessage, SMTP, SMTP_SSL, _forgot_failed, _forgot_success, after, create_default_context, ehlo, get, get_smtp_config, int, join, login, quit, reset_user_password_for_recovery, send_message, set_content, split, starttls, str, strip
+- `LoginWindow._ask_username_for_reset` (line 303) calls: CTkButton, CTkEntry, CTkFrame, CTkLabel, CTkToplevel, _cancel, _submit, attributes, bind, focus_set, geometry, get, grab_set, insert, pack, resizable, strip, title, transient, update_idletasks, wait_window, winfo_height, winfo_reqheight, winfo_reqwidth, winfo_rootx, winfo_rooty, winfo_width
+- `LoginWindow._submit` (line 331) calls: destroy, get, strip
+- `LoginWindow._cancel` (line 335) calls: destroy
+- `LoginWindow._forgot_success` (line 371) calls: _toast, configure, lower, str
+- `LoginWindow._forgot_failed` (line 381) calls: _toast, configure
+- `LoginWindow._attempt_login` (line 385) calls: _on_success, authenticate, configure, delete, destroy, focus_set, get, strip, update_idletasks, withdraw
+- `LoginWindow._on_close` (line 410) calls: destroy
+
+### modern_dashboard.py
+- `get_live_cache_recent` (line 69) calls: get_live_reading, hasattr
+- `_fallback_get_k_factor_rules` (line 75) calls: None
+- `_fallback_upsert_k_factor_rule` (line 78) calls: RuntimeError
+- `_fallback_delete_k_factor_rule` (line 81) calls: RuntimeError
+- `_fallback_get_k_factor_for_device_address` (line 84) calls: None
+- `_make_icon` (line 165) calls: CTkImage, Draw, arc, cos, ellipse, int, line, max, new, radians, range, rectangle, sin
+- `_load_icon_from_assets` (line 273) calls: CTkImage, abspath, convert, dirname, get, isfile, join, open
+- `crc16_modbus` (line 349) calls: range
+- `build_scan_command` (line 359) calls: bytes, crc16_modbus, pack
+- `parse_device_response` (line 366) calls: crc16_modbus, get, len, round, time, unpack_from
+- `MockScanner.__init__` (line 422) calls: round, uniform
+- `MockScanner.scan` (line 433) calls: _make_fake_response, append, on_progress, parse_device_response, range, round, sleep
+- `MockScanner.poll_device` (line 453) calls: _make_fake_response, max, min, parse_device_response, round, uniform
+- `MockScanner._make_fake_response` (line 468) calls: bytes, crc16_modbus, int, pack
+- `RS485Scanner.__init__` (line 499) calls: None
+- `RS485Scanner.open` (line 504) calls: Serial
+- `RS485Scanner.close` (line 511) calls: close
+- `RS485Scanner.scan` (line 515) calls: append, build_scan_command, len, on_progress, parse_device_response, range, read, reset_input_buffer, write
+- `RS485Scanner.poll_device` (line 533) calls: build_scan_command, len, parse_device_response, read, reset_input_buffer, write
+- `PollingEngine.__init__` (line 550) calls: Event, Thread
+- `PollingEngine.start` (line 558) calls: start
+- `PollingEngine.stop` (line 559) calls: set
+- `PollingEngine._loop` (line 561) calls: _callback, append, is_set, poll_device, wait
+- `ConnectionDialog.__init__` (line 581) calls: __init__, _build, after, configure, geometry, grab_set, resizable, super, title
+- `ConnectionDialog._center` (line 594) calls: geometry, update_idletasks, winfo_height, winfo_screenheight, winfo_screenwidth, winfo_width
+- `ConnectionDialog._build` (line 601) calls: CTkButton, CTkFrame, CTkLabel, CTkOptionMenu, CTkProgressBar, CTkSegmentedButton, StringVar, columnconfigure, comports, grid, pack, set
+- `ConnectionDialog._on_mode_change` (line 670) calls: pack, pack_forget
+- `ConnectionDialog._start_scan` (line 677) calls: MockScanner, RS485Scanner, Thread, configure, get, int, open, set, start
+- `ConnectionDialog._run_scan` (line 706) calls: after, scan
+- `ConnectionDialog.on_progress` (line 707) calls: after
+- `ConnectionDialog._scan_done` (line 716) calls: _on_complete, after, configure, destroy, grab_release, len
+- `SensorCard._ensure_registry` (line 779) calls: WeakSet
+- `SensorCard.update_all_std` (line 784) calls: _refresh_std_pill, list
+- `SensorCard.__init__` (line 793) calls: CTkFrame, __init__, _build, _ensure_registry, add, get, pack, super
+- `SensorCard._alarm_color` (line 818) calls: get
+- `SensorCard._tint` (line 825) calls: get
+- `SensorCard._fmt_stat` (line 833) calls: float
+- `SensorCard._build` (line 842) calls: CTkButton, CTkEntry, CTkFrame, CTkLabel, _alarm_color, _make_pill, _tint, columnconfigure, debug, fromisoformat, get, grid, grid_columnconfigure, pack, replace, str, strftime
+- `SensorCard._make_pill` (line 1040) calls: CTkFrame, CTkLabel, grid_propagate, pack
+- `SensorCard._refresh_std_pill` (line 1053) calls: configure
+- `SensorCard._update_minute_stats` (line 1061) calls: _fmt_stat, configure, get
+- `SensorCard._start_name_edit` (line 1070) calls: _cancel_name_edit, _confirm_name_edit, bind, configure, delete, focus_set, insert, pack, pack_forget
+- `SensorCard._confirm_name_edit` (line 1085) calls: _cancel_name_edit, _on_rename, configure, get, log_journal, pack, rename_device, str, strip
+- `SensorCard._cancel_name_edit` (line 1115) calls: configure, pack, pack_forget
+- `SensorCard.update` (line 1126) calls: _alarm_color, _tint, _update_minute_stats, append, configure, fromisoformat, get, len, pop, replace, str, strftime
+- `DashboardHeader.__init__` (line 1215) calls: CTkButton, CTkFrame, CTkImage, CTkLabel, __init__, _resolve_company_location, abspath, capitalize, convert, dirname, join, open, pack, pack_propagate, resize, super, update_time
+- `DashboardHeader.update_time` (line 1349) calls: configure, now, strftime
+- `DashboardHeader._resolve_company_location` (line 1353) calls: get, get_all_plants, str
+- `Sidebar.__init__` (line 1379) calls: __init__, _build, pack_propagate, super
+- `Sidebar._build` (line 1393) calls: CTkButton, CTkFrame, CTkLabel, _apply_sidebar_mode, _load_icon_from_assets, _make_icon, _nav, list, pack
+- `Sidebar._nav` (line 1461) calls: _on_navigate, configure, items
+- `Sidebar.update_status` (line 1472) calls: configure
+- `Sidebar.toggle_sidebar` (line 1486) calls: _apply_sidebar_mode
+- `Sidebar._apply_sidebar_mode` (line 1490) calls: configure, items, pack_configure
+- `DashboardView.__init__` (line 1515) calls: CTkFrame, CTkScrollableFrame, __init__, add_or_update_device, columnconfigure, int, max, pack, range, super
+- `DashboardView.add_or_update_device` (line 1537) calls: SensorCard, divmod, get, grid, int, len, update
+- `DashboardView.update` (line 1554) calls: get, update
+- `DashboardView.cards` (line 1561) calls: None
+- `TrendGraphView.__init__` (line 1571) calls: __init__, _build, deque, enumerate, len, sorted, super
+- `TrendGraphView._build` (line 1586) calls: BooleanVar, CTkButton, CTkFrame, CTkLabel, Figure, FigureCanvasTkAgg, _render_legend, add_subplot, annotate, dict, draw, get, get_tk_widget, grid, items, keys, mpl_connect, pack, plot, set_color, set_facecolor, set_visible, set_xlabel, set_ylabel, sorted, subplots_adjust, tick_params, values
+- `TrendGraphView._render_legend` (line 1661) calls: draw_idle, get_label, get_size_inches, get_visible, hasattr, int, legend, len, max, min, remove, str, subplots_adjust, sum, values
+- `TrendGraphView._hide_hover` (line 1700) calls: draw_idle, get_visible, set_visible
+- `TrendGraphView._on_hover_leave` (line 1711) calls: _hide_hover
+- `TrendGraphView._on_hover_move` (line 1715) calls: _hide_hover, bisect_left, draw_idle, float, get, get_color, get_visible, get_xdata, get_ydata, hasattr, items, len, list, monotonic, num2date, set_color, set_data, set_text, set_visible, strftime, strip, tolist, transform
+- `TrendGraphView._show_device_filter` (line 1779) calls: CTkCheckBox, CTkFrame, CTkLabel, Toplevel, attributes, bind, configure, destroy, focus_force, geometry, get, keys, overrideredirect, pack, sorted, update_idletasks, winfo_exists, winfo_height, winfo_rootx, winfo_rooty
+- `TrendGraphView._toggle_all` (line 1840) calls: _render_legend, get, items, set, set_visible, values
+- `TrendGraphView._apply_filter` (line 1849) calls: _render_legend, all, get, items, set, set_visible, values
+- `TrendGraphView.update_device_name` (line 1857) calls: _render_legend, set_label
+- `TrendGraphView.add_device` (line 1867) calls: BooleanVar, _render_legend, deque, get, int, len, plot, set
+- `TrendGraphView.push_reading` (line 1889) calls: append, date2num, set_xdata, set_ydata
+- `TrendGraphView.redraw` (line 1900) calls: AutoDateLocator, DateFormatter, _render_legend, autofmt_xdate, autoscale_view, draw_idle, relim, set_major_formatter, set_major_locator
+- `_CalendarPopup.__init__` (line 1923) calls: CTkFrame, StringVar, __init__, _dismiss, _render, attributes, bind, configure, date, focus_force, geometry, overrideredirect, pack, replace, super, update_idletasks, winfo_height, winfo_reqheight, winfo_reqwidth, winfo_rootx, winfo_rooty
+- `_CalendarPopup._dismiss` (line 1952) calls: destroy
+- `_CalendarPopup._render` (line 1958) calls: CTkButton, CTkFrame, CTkLabel, CTkOptionMenu, _pick, columnconfigure, date, destroy, enumerate, grid, monthcalendar, pack, range, str, strftime, winfo_children
+- `_CalendarPopup._prev_month` (line 2051) calls: _render, deiconify, focus_force, replace, update_idletasks, withdraw
+- `_CalendarPopup._next_month` (line 2062) calls: _render, deiconify, focus_force, replace, update_idletasks, withdraw
+- `_CalendarPopup._pick` (line 2073) calls: _render, deiconify, focus_force, update_idletasks, withdraw
+- `_CalendarPopup._apply` (line 2081) calls: _callback, _dismiss, datetime, get, int, strftime
+- `DeviceLogsView.__init__` (line 2102) calls: __init__, _build, keys, set, super
+- `DeviceLogsView._build` (line 2116) calls: CTkButton, CTkEntry, CTkFrame, CTkLabel, CTkOptionMenu, CTkScrollableFrame, CTkScrollbar, Canvas, StringVar, _go_page, _rebuild_matrix_headers, _sync_table_x_layout, bind, configure, create_window, get, insert, keys, now, pack, place, replace, sorted, strftime
+- `DeviceLogsView._show_loading` (line 2320) calls: lift, place, update_idletasks
+- `DeviceLogsView._hide_loading` (line 2325) calls: place_forget
+- `DeviceLogsView._sync_table_x_layout` (line 2328) calls: bbox, configure, itemconfigure, max, update_idletasks, winfo_height, winfo_reqheight, winfo_reqwidth, winfo_width
+- `DeviceLogsView._refresh_device_filter_text` (line 2346) calls: len, set
+- `DeviceLogsView._get_active_device_columns` (line 2354) calls: append, get, int, keys, sorted, str
+- `DeviceLogsView._rebuild_matrix_headers` (line 2364) calls: CTkLabel, _sync_table_x_layout, columnconfigure, destroy, enumerate, grid, len, range, winfo_children
+- `DeviceLogsView.update_device_name` (line 2390) calls: _refresh_device_filter_text, get, keys, sorted
+- `DeviceLogsView.add_device` (line 2407) calls: _refresh_device_filter_text, add, get, int, keys, sorted
+- `DeviceLogsView._show_device_dropdown` (line 2428) calls: BooleanVar, CTkButton, CTkCheckBox, CTkFrame, CTkLabel, CTkScrollableFrame, Toplevel, all, attributes, bind, configure, deiconify, destroy, focus_force, geometry, get, keys, len, max, min, overrideredirect, pack, set, sorted, update_idletasks, values, winfo_exists, winfo_height, winfo_reqheight, winfo_reqwidth, winfo_rootx, winfo_rooty, withdraw
+- `DeviceLogsView._toggle_all` (line 2454) calls: get, set, values
+- `DeviceLogsView._apply` (line 2484) calls: _refresh_device_filter_text, destroy, get, items, keys, set
+- `DeviceLogsView._open_from_cal` (line 2510) calls: _CalendarPopup, _parse_dt_entry, get, now, replace, strip
+- `DeviceLogsView._open_to_cal` (line 2520) calls: _CalendarPopup, _parse_dt_entry, get, now, replace, strip
+- `DeviceLogsView._set` (line 2526) calls: delete, insert
+- `DeviceLogsView._parse_dt_entry` (line 2531) calls: ValueError, replace, strip, strptime
+- `DeviceLogsView._fetch` (line 2548) calls: _load_page, _parse_dt_entry, _update_total, append, configure, get, get_device_by_address, int, len, sorted, strip
+- `DeviceLogsView._update_total` (line 2586) calls: count_distinct_recorded_at_in_range, exception, get
+- `DeviceLogsView._load_page` (line 2604) calls: _get_active_device_columns, _hide_loading, _rebuild_matrix_headers, _render_table, _show_loading, configure, exception, get, get_device_logs_matrix_page, len, max
+- `DeviceLogsView._go_page` (line 2651) calls: _load_page
+- `DeviceLogsView._render_table` (line 2655) calls: CTkLabel, append, clear, destroy, enumerate, float, get, grid, int, str
+- `DeviceLogsView._show_export_menu` (line 2711) calls: CTkFrame, CTkLabel, Toplevel, _bind_row, attributes, bind, configure, destroy, focus_force, geometry, max, min, overrideredirect, pack, update_idletasks, winfo_exists, winfo_height, winfo_reqheight, winfo_reqwidth, winfo_rootx, winfo_rooty, winfo_toplevel, winfo_width
+- `DeviceLogsView._pick` (line 2728) calls: cmd, destroy
+- `DeviceLogsView._bind_row` (line 2732) calls: bind, configure, list, winfo_children
+- `DeviceLogsView._on_enter` (line 2734) calls: configure, winfo_children
+- `DeviceLogsView._on_leave` (line 2741) calls: configure, winfo_children
+- `DeviceLogsView._on_click` (line 2748) calls: _pick
+- `DeviceLogsView._get_export_rows` (line 2810) calls: _parse_dt_entry, append, configure, exception, get, get_all_readings_in_range, get_device_by_address, get_readings_for_devices_in_range, get_readings_in_range, len, sorted, strip
+- `DeviceLogsView._aggregate_for_export` (line 2867) calls: append, float, get, int, max, sort, str, strftime, strptime, timedelta, total_seconds, values
+- `DeviceLogsView._export_step_seconds` (line 2929) calls: get
+- `DeviceLogsView._generate_export_timestamps` (line 2940) calls: _export_step_seconds, append, replace, strftime, timedelta
+- `DeviceLogsView._export_csv` (line 2961) calls: _aggregate_for_export, _build_export_matrix, _generate_export_timestamps, _get_export_rows, append, asksaveasfilename, basename, configure, exception, get, open, writer, writerow
+- `DeviceLogsView._build_export_matrix` (line 3004) calls: append, float, get, int, list, sorted, str
+- `DeviceLogsView._build_export_summary` (line 3051) calls: append, float, get, len, max, min, str, sum
+- `DeviceLogsView._export_pdf` (line 3084) calls: _aggregate_for_export, _build_export_matrix, _generate_export_timestamps, _get_export_rows, asksaveasfilename, basename, build_device_logs_report_pdf_bytes, configure, exception, get, open, strftime, write
+- `HistoricTrendView.__init__` (line 3139) calls: __init__, _build, enumerate, keys, len, set, sorted, super
+- `HistoricTrendView._build` (line 3152) calls: CTkButton, CTkEntry, CTkFrame, CTkLabel, CTkOptionMenu, Figure, FigureCanvasTkAgg, StringVar, _refresh_device_filter_text, _render_legend, add_subplot, annotate, dict, draw, get, get_tk_widget, grid, insert, items, mpl_connect, now, pack, plot, replace, set_color, set_facecolor, set_visible, set_xlabel, set_ylabel, strftime, subplots_adjust, tick_params, values
+- `HistoricTrendView._render_legend` (line 3310) calls: draw_idle, get_label, get_size_inches, get_visible, hasattr, int, legend, len, max, min, remove, str, subplots_adjust, sum, values
+- `HistoricTrendView._hide_hover` (line 3349) calls: draw_idle, get_visible, set_visible
+- `HistoricTrendView._on_hover_leave` (line 3360) calls: _hide_hover
+- `HistoricTrendView._on_hover_move` (line 3364) calls: _hide_hover, bisect_left, draw_idle, float, get, get_color, get_visible, get_xdata, get_ydata, hasattr, items, len, list, monotonic, num2date, set_color, set_data, set_text, set_visible, strftime, strip, tolist, transform
+- `HistoricTrendView._refresh_device_filter_text` (line 3425) calls: len, set
+- `HistoricTrendView._show_device_dropdown` (line 3433) calls: BooleanVar, CTkButton, CTkCheckBox, CTkFrame, CTkLabel, CTkScrollableFrame, Toplevel, all, attributes, bind, configure, deiconify, destroy, focus_force, geometry, get, keys, len, max, min, overrideredirect, pack, set, sorted, update_idletasks, values, winfo_exists, winfo_height, winfo_reqheight, winfo_reqwidth, winfo_rootx, winfo_rooty, withdraw
+- `HistoricTrendView._toggle_all` (line 3458) calls: get, set, values
+- `HistoricTrendView._apply` (line 3493) calls: _apply_visibility, _refresh_device_filter_text, destroy, get, items, keys, set
+- `HistoricTrendView._open_from_cal` (line 3526) calls: _CalendarPopup, _parse_dt_entry, get, now, replace, strip
+- `HistoricTrendView._open_to_cal` (line 3537) calls: _CalendarPopup, _parse_dt_entry, get, now, replace, strip
+- `HistoricTrendView._set` (line 3544) calls: delete, insert
+- `HistoricTrendView._parse_dt_entry` (line 3549) calls: ValueError, replace, strip, strptime
+- `HistoricTrendView._apply_visibility` (line 3565) calls: _hide_hover, _render_legend, items, set_visible
+- `HistoricTrendView._has_chart_data` (line 3572) calls: get_visible, get_xdata, len, values
+- `HistoricTrendView._show_hist_export_menu` (line 3581) calls: CTkFrame, CTkLabel, Toplevel, _add_row, attributes, bind, configure, destroy, focus_force, geometry, max, min, overrideredirect, pack, update_idletasks, winfo_exists, winfo_height, winfo_reqheight, winfo_reqwidth, winfo_rootx, winfo_rooty, winfo_toplevel, winfo_width
+- `HistoricTrendView._pick` (line 3606) calls: cmd, destroy
+- `HistoricTrendView._add_row` (line 3610) calls: CTkFrame, CTkLabel, bind, configure, list, pack, winfo_children
+- `HistoricTrendView._on_enter` (line 3641) calls: configure
+- `HistoricTrendView._on_leave` (line 3644) calls: configure
+- `HistoricTrendView._on_click` (line 3647) calls: _pick
+- `HistoricTrendView._export_png` (line 3693) calls: _has_chart_data, asksaveasfilename, basename, configure, exception, get_facecolor, now, savefig, strftime
+- `HistoricTrendView._export_pdf` (line 3730) calls: BytesIO, HRFlowable, HexColor, Paragraph, ParagraphStyle, RLImage, SimpleDocTemplate, Spacer, Table, TableStyle, _has_chart_data, add, append, asksaveasfilename, basename, build, configure, exception, get, getSampleStyleSheet, get_all_plants, get_facecolor, landscape, len, now, savefig, seek, setStyle, str, strftime, strip
+- `HistoricTrendView._fetch` (line 3863) calls: AutoDateLocator, DateFormatter, _apply_visibility, _parse_dt_entry, _render_legend, append, autofmt_xdate, autoscale_view, configure, date2num, draw_idle, exception, float, fromisoformat, fromtimestamp, get, get_all_readings_in_range, get_device_by_address, get_readings_for_devices_in_range, get_readings_in_range, int, items, keys, len, relim, replace, set_major_formatter, set_major_locator, set_xdata, set_ydata, setdefault, sorted, str, strip, strptime, sum, timestamp, values
+- `HistoricTrendView.update_device_name` (line 3978) calls: _render_legend, set_label
+- `HistoricTrendView.add_device` (line 3987) calls: _apply_visibility, _refresh_device_filter_text, add, get, int, len, plot
+- `AnalyticsView.__init__` (line 4021) calls: CTkButton, CTkFrame, DeviceLogsView, HistoricTrendView, TrendGraphView, __init__, _switch_tab, columnconfigure, enumerate, grid, grid_propagate, len, pack, range, rowconfigure, super
+- `AnalyticsView._switch_tab` (line 4085) calls: configure, items, pack, pack_forget
+- `AnalyticsView.update_device_name` (line 4107) calls: update_device_name
+- `AnalyticsView.push_reading` (line 4112) calls: push_reading
+- `AnalyticsView.add_device` (line 4115) calls: add_device, all, append, get, int
+- `AnalyticsView.redraw_trend` (line 4125) calls: redraw
+- `JournalView.__init__` (line 4133) calls: CTkButton, CTkFrame, CTkLabel, CTkScrollableFrame, __init__, pack, super
+- `JournalView.refresh` (line 4173) calls: CTkFrame, CTkLabel, destroy, enumerate, get, get_journal, pack, winfo_children
+- `SettingsView.__init__` (line 4212) calls: CTkButton, CTkFrame, __init__, _build_alert_mgmt, _build_general, _build_report_mgmt, _build_unauthorized, _build_user_mgmt, _switch_tab, bool, columnconfigure, enumerate, grid, grid_propagate, len, list, pack, range, rowconfigure, super
+- `SettingsView._switch_tab` (line 4296) calls: _refresh_alert_list, _refresh_k_factor_device_options, _refresh_k_factor_rules, _refresh_offline_alert_config, _refresh_report_event_list, _refresh_user_list, configure, items, pack, pack_forget
+- `SettingsView._build_unauthorized` (line 4337) calls: CTkFrame, CTkLabel, pack, place
+- `SettingsView._build_report_mgmt` (line 4399) calls: CTkButton, CTkEntry, CTkFrame, CTkLabel, CTkOptionMenu, CTkScrollableFrame, StringVar, _build_time_picker, pack
+- `SettingsView._add_report_event` (line 4516) calls: _get_actor, _get_report_sched_time, _refresh_report_event_list, add_report_scheduler, configure, delete, get, set, strip
+- `SettingsView._refresh_report_event_list` (line 4537) calls: CTkLabel, _render_report_event_card, destroy, get_report_schedulers, pack, winfo_children
+- `SettingsView._render_report_event_card` (line 4556) calls: CTkButton, CTkFrame, CTkLabel, _delete_report_email, _delete_report_event, _open_add_report_mail_dialog, get, pack
+- `SettingsView._open_add_report_mail_dialog` (line 4613) calls: _get_actor, _refresh_report_event_list, add_report_scheduler_email, askstring, configure, strip
+- `SettingsView._delete_report_email` (line 4634) calls: _get_actor, _refresh_report_event_list, configure, delete_report_scheduler_email
+- `SettingsView._delete_report_event` (line 4648) calls: _get_actor, _refresh_report_event_list, configure, delete_report_scheduler
+- `SettingsView._build_time_picker` (line 4662) calls: CTkButton, CTkFrame, CTkLabel, StringVar, _sync, dict, pack, setattr
+- `SettingsView._sync` (line 4674) calls: configure
+- `SettingsView._toggle_ampm` (line 4723) calls: configure, get, set
+- `SettingsView._get_report_sched_time` (line 4740) calls: get
+- `SettingsView._on_freq_changed` (line 4750) calls: configure
+- `SettingsView._test_report_send` (line 4756) calls: Header, MIMEApplication, MIMEMultipart, MIMEText, SMTP, SMTP_SSL, _get_actor, _valid_email, add_header, as_string, attach, build_device_logs_report_pdf_bytes, configure, create_default_context, ehlo, exception, get, get_all_live_readings, get_smtp_config, int, join, log_journal, login, now, quit, sendmail, split, starttls, str, strftime, strip, update
+- `SettingsView._build_general` (line 4902) calls: BooleanVar, CTkButton, CTkCheckBox, CTkEntry, CTkFrame, CTkLabel, CTkOptionMenu, CTkScrollableFrame, CTkSegmentedButton, StringVar, _on_k_rule_form_enabled_toggle, _refresh_k_factor_device_options, _refresh_k_factor_rules, _smtp_row, get, get_smtp_config, insert, int, pack, str
+- `SettingsView._smtp_row` (line 5024) calls: CTkFrame, pack
+- `SettingsView._apply` (line 5124) calls: configure, float, get, log_journal, strip, update_all_std
+- `SettingsView._refresh_k_factor_device_options` (line 5140) calls: append, configure, exception, get, get_all_devices, int, set
+- `SettingsView._on_k_rule_form_enabled_toggle` (line 5157) calls: bool, configure, exception, get
+- `SettingsView._add_k_factor_rule` (line 5167) calls: _get_actor, _refresh_k_factor_rules, bool, configure, exception, float, get, log_journal, strip, upsert_k_factor_rule
+- `SettingsView._refresh_k_factor_rules` (line 5205) calls: CTkLabel, _render_k_factor_rule_card, destroy, exception, get_k_factor_rules, pack, winfo_children
+- `SettingsView._render_k_factor_rule_card` (line 5229) calls: BooleanVar, CTkButton, CTkCheckBox, CTkEntry, CTkFrame, CTkLabel, StringVar, _sync_rule_entry_state, bool, float, get, int, pack, str
+- `SettingsView._sync_rule_entry_state` (line 5259) calls: bool, configure, exception, get
+- `SettingsView._save_rule` (line 5274) calls: _get_actor, _refresh_k_factor_rules, abs, append, bool, configure, exception, float, get, int, join, log_journal, strip, upsert_k_factor_rule
+- `SettingsView._build_alert_mgmt` (line 5353) calls: BooleanVar, CTkButton, CTkEntry, CTkFrame, CTkLabel, CTkOptionMenu, CTkScrollableFrame, CTkSwitch, StringVar, pack, pack_forget, pack_propagate, place
+- `SettingsView._get_actor` (line 5540) calls: None
+- `SettingsView._toggle_rules` (line 5543) calls: configure, pack, pack_forget
+- `SettingsView._show_toast` (line 5552) calls: CTkLabel, after, place, winfo_toplevel
+- `SettingsView._add_alert_entry` (line 5564) calls: _get_actor, _refresh_alert_list, add_alert, configure, delete, float, get, strip
+- `SettingsView._save_offline_alert_config` (line 5588) calls: _get_actor, after, append, configure, exception, get, get_offline_alert_config, int, join, log_journal, update_offline_alert_config
+- `SettingsView._on_offline_alert_toggle` (line 5631) calls: _save_offline_alert_config
+- `SettingsView._refresh_offline_alert_config` (line 5635) calls: bool, exception, get, get_offline_alert_config, set
+- `SettingsView._refresh_alert_list` (line 5650) calls: _render_rule_card, configure, destroy, get_alert_rules, len, min, pack, pack_forget, winfo_children
+- `SettingsView._render_rule_card` (line 5672) calls: CTkButton, CTkFrame, CTkLabel, CTkOptionMenu, StringVar, _delete_email, _delete_rule, pack
+- `SettingsView._on_occ_change` (line 5692) calls: _get_actor, _show_toast, update_rule_occurrence
+- `SettingsView._delete_rule` (line 5727) calls: _get_actor, _refresh_alert_list, configure, delete_alert_rule
+- `SettingsView._delete_email` (line 5736) calls: _get_actor, _refresh_alert_list, delete_alert_email
+- `SettingsView._save_smtp` (line 5743) calls: _get_actor, configure, get, int, save_smtp_config, strip
+- `SettingsView._test_smtp` (line 5765) calls: Thread, configure, get, int, join, len, split, start, strip, update_idletasks
+- `SettingsView._send` (line 5795) calls: EmailMessage, SMTP, SMTP_SSL, after, configure, create_default_context, decode, ehlo, isinstance, login, send_message, set_content, splitlines, starttls, str
+- `SettingsView._build_user_mgmt` (line 5840) calls: CTkButton, CTkFrame, CTkLabel, CTkScrollableFrame, pack
+- `SettingsView._refresh_user_list` (line 5884) calls: _add_user_row, destroy, list_users, winfo_children
+- `SettingsView._add_user_row` (line 5897) calls: CTkButton, CTkFrame, CTkLabel, _delete_user, _open_edit_user, capitalize, pack
+- `SettingsView._open_add_user` (line 5941) calls: _user_form_popup
+- `SettingsView._open_edit_user` (line 5944) calls: _user_form_popup
+- `SettingsView._user_form_popup` (line 5947) calls: BooleanVar, CTkButton, CTkCheckBox, CTkEntry, CTkFrame, CTkLabel, CTkOptionMenu, CTkScrollableFrame, CTkToplevel, StringVar, _lbl, _save, bind, configure, deiconify, geometry, grab_set, insert, pack, place, resizable, title, update_idletasks, winfo_height, winfo_rootx, winfo_rooty, winfo_width, withdraw
+- `SettingsView._lbl` (line 5988) calls: CTkLabel, pack
+- `SettingsView._save` (line 6041) calls: _get_actor, _refresh_user_list, change_password, configure, create_user, destroy, get, log_journal, strip, update_user
+- `SettingsView._delete_user` (line 6095) calls: _del, _get_actor, _refresh_user_list, configure, log_journal
+- `_install_global_scroll` (line 6119) calls: bind_all
+- `_find_scroll_canvas` (line 6126) calls: isinstance, nametowidget, winfo_parent
+- `_on_wheel` (line 6142) calls: _find_scroll_canvas, int, yview_scroll
+- `DashboardApp.__init__` (line 6161) calls: AnalyticsView, CTkFrame, DashboardHeader, DashboardView, JournalView, PollingEngine, SettingsView, Sidebar, __init__, _install_global_scroll, _navigate, _resolve_total_devices_count, _seed_startup_stats, _tick_clock, after, after_idle, columnconfigure, configure, get, grid, grid_remove, isinstance, len, min, minsize, pack, protocol, rowconfigure, set_appearance_mode, set_default_color_theme, start, state, super, time, title, update_idletasks, values, wm_attributes
+- `DashboardApp._seed_startup_stats` (line 6262) calls: deque, exception, extend, float, get, get_live_cache_recent, len, max, min, reversed, round, setdefault, str, sum
+- `DashboardApp._shutdown_runtime` (line 6291) calls: close, close_connection, exception, hasattr, stop
+- `DashboardApp._resolve_total_devices_count` (line 6311) calls: exception, get_all_devices, get_default_plant_id, len
+- `DashboardApp._sync_new_devices_from_db` (line 6322) calls: add, add_device, add_or_update_device, append, bool, exception, float, get, get_all_devices, get_default_plant_id, get_latest_reading, info, int, len, sort, sorted
+- `DashboardApp._navigate` (line 6386) calls: grid, grid_remove, refresh
+- `DashboardApp._on_device_rename` (line 6398) calls: get, update_device_name
+- `DashboardApp._on_logout` (line 6407) calls: _shutdown_runtime, destroy, main
+- `DashboardApp._on_poll` (line 6414) calls: after
+- `DashboardApp._append_minute_sample` (line 6417) calls: append, deque, float, setdefault
+- `DashboardApp._flush_minute_stats` (line 6424) calls: clear, deque, get, len, list, max, min, round, setdefault, sum, time
+- `DashboardApp._collect_live_samples` (line 6448) calls: _append_minute_sample, _check_device_status_flags, _refresh_from_db, after, exception, float, fromisoformat, get, get_all_latest_transaction_readings, get_all_live_cache_latest, int, now, push_reading, redraw_trend, replace, str, strptime
+- `DashboardApp._check_device_status_flags` (line 6506) calls: _refresh_from_db, bool, copy, exception, get, get_all_devices, get_default_plant_id, hasattr, int, items
+- `DashboardApp._schedule_next_db_refresh` (line 6539) calls: after, after_cancel, int, max, now, replace, timedelta, total_seconds
+- `DashboardApp._refresh_from_db` (line 6551) calls: _flush_minute_stats, _schedule_next_db_refresh, _sync_new_devices_from_db, append, bool, exception, float, fromisoformat, get, get_all_devices, get_all_latest_transaction_readings, get_default_plant_id, int, len, now, redraw_trend, replace, str, strptime, time, update, update_status
+- `DashboardApp._process_poll` (line 6638) calls: _append_minute_sample, _flush_minute_stats, check_and_fire, exception, float, get, get_k_factor_for_device_address, insert_reading, int, len, now, push_reading, redraw_trend, strftime, time, update, update_status
+- `DashboardApp._tick_clock` (line 6718) calls: after, update_time
+- `DashboardApp._on_close` (line 6723) calls: _shutdown_runtime, destroy
+- `main` (line 6731) calls: CTk, LoginWindow, exception, initialise_schema, mainloop, set_appearance_mode, set_default_color_theme, withdraw
+- `load_devices_from_db` (line 6747) calls: append, bool, exception, float, get, get_all_devices, get_default_plant_id, get_latest_reading, initialise_schema, int, sort
+- `on_login_success` (line 6801) calls: DashboardApp, destroy, load_devices_from_db, mainloop
+
+## Cross-File Function Call Links (heuristic)
+
+### From alert_manager.py
+- `_get_last_alert_fire_epoch` -> `h2_background_service.py::MockScanner.close`
+- `_get_last_alert_fire_epoch` -> `h2_background_service.py::RS485Scanner.close`
+- `_get_last_alert_fire_epoch` -> `modern_dashboard.py::RS485Scanner.close`
+- `_insert_alert_fire_log` -> `h2_background_service.py::MockScanner.close`
+- `_insert_alert_fire_log` -> `h2_background_service.py::RS485Scanner.close`
+- `_insert_alert_fire_log` -> `modern_dashboard.py::RS485Scanner.close`
+- `_mark_report_scheduler_sent` -> `h2_background_service.py::MockScanner.close`
+- `_mark_report_scheduler_sent` -> `h2_background_service.py::RS485Scanner.close`
+- `_mark_report_scheduler_sent` -> `modern_dashboard.py::RS485Scanner.close`
+- `add_alert` -> `h2_background_service.py::MockScanner.close`
+- `add_alert` -> `h2_background_service.py::RS485Scanner.close`
+- `add_alert` -> `modern_dashboard.py::RS485Scanner.close`
+- `add_report_scheduler` -> `h2_background_service.py::MockScanner.close`
+- `add_report_scheduler` -> `h2_background_service.py::RS485Scanner.close`
+- `add_report_scheduler` -> `modern_dashboard.py::RS485Scanner.close`
+- `add_report_scheduler_email` -> `h2_background_service.py::MockScanner.close`
+- `add_report_scheduler_email` -> `h2_background_service.py::RS485Scanner.close`
+- `add_report_scheduler_email` -> `modern_dashboard.py::RS485Scanner.close`
+- `build_device_logs_report_pdf_bytes` -> `db_repository.py::get_all_plants`
+- `check_and_fire` -> `h2_background_service.py::BackgroundPollingService.start`
+- `check_and_fire` -> `modern_dashboard.py::PollingEngine.start`
+- `check_and_fire_offline_alert` -> `db_repository.py::get_offline_alert_config`
+- `check_and_fire_offline_alert` -> `db_repository.py::update_offline_alert_timestamp`
+- `check_and_fire_offline_alert` -> `h2_background_service.py::BackgroundPollingService.start`
+- `check_and_fire_offline_alert` -> `modern_dashboard.py::DashboardView.update`
+- `check_and_fire_offline_alert` -> `modern_dashboard.py::PollingEngine.start`
+- `check_and_fire_offline_alert` -> `modern_dashboard.py::SensorCard.update`
+- `delete_alert_email` -> `h2_background_service.py::MockScanner.close`
+- `delete_alert_email` -> `h2_background_service.py::RS485Scanner.close`
+- `delete_alert_email` -> `modern_dashboard.py::RS485Scanner.close`
+- `delete_alert_rule` -> `h2_background_service.py::MockScanner.close`
+- `delete_alert_rule` -> `h2_background_service.py::RS485Scanner.close`
+- `delete_alert_rule` -> `modern_dashboard.py::RS485Scanner.close`
+- `delete_report_scheduler` -> `h2_background_service.py::MockScanner.close`
+- `delete_report_scheduler` -> `h2_background_service.py::RS485Scanner.close`
+- `delete_report_scheduler` -> `modern_dashboard.py::RS485Scanner.close`
+- `delete_report_scheduler_email` -> `h2_background_service.py::MockScanner.close`
+- `delete_report_scheduler_email` -> `h2_background_service.py::RS485Scanner.close`
+- `delete_report_scheduler_email` -> `modern_dashboard.py::RS485Scanner.close`
+- `get_alert_rules` -> `h2_background_service.py::MockScanner.close`
+- `get_alert_rules` -> `h2_background_service.py::RS485Scanner.close`
+- `get_alert_rules` -> `modern_dashboard.py::RS485Scanner.close`
+- `get_journal` -> `h2_background_service.py::MockScanner.close`
+- `get_journal` -> `h2_background_service.py::RS485Scanner.close`
+- `get_journal` -> `modern_dashboard.py::RS485Scanner.close`
+- `get_report_schedulers` -> `h2_background_service.py::MockScanner.close`
+- `get_report_schedulers` -> `h2_background_service.py::RS485Scanner.close`
+- `get_report_schedulers` -> `modern_dashboard.py::RS485Scanner.close`
+- `get_smtp_config` -> `h2_background_service.py::MockScanner.close`
+- `get_smtp_config` -> `h2_background_service.py::RS485Scanner.close`
+- `get_smtp_config` -> `modern_dashboard.py::RS485Scanner.close`
+- `init_alert_db` -> `h2_background_service.py::MockScanner.close`
+- `init_alert_db` -> `h2_background_service.py::RS485Scanner.close`
+- `init_alert_db` -> `modern_dashboard.py::RS485Scanner.close`
+- `log_journal` -> `h2_background_service.py::MockScanner.close`
+- `log_journal` -> `h2_background_service.py::RS485Scanner.close`
+- `log_journal` -> `modern_dashboard.py::RS485Scanner.close`
+- `run_pending_scheduled_reports` -> `db_repository.py::get_all_readings_in_range`
+- `save_smtp_config` -> `h2_background_service.py::MockScanner.close`
+- `save_smtp_config` -> `h2_background_service.py::RS485Scanner.close`
+- `save_smtp_config` -> `modern_dashboard.py::RS485Scanner.close`
+- `send_report` -> `h2_background_service.py::MockScanner.close`
+- `send_report` -> `h2_background_service.py::RS485Scanner.close`
+- `send_report` -> `modern_dashboard.py::RS485Scanner.close`
+- `update_rule_occurrence` -> `h2_background_service.py::MockScanner.close`
+- `update_rule_occurrence` -> `h2_background_service.py::RS485Scanner.close`
+- `update_rule_occurrence` -> `modern_dashboard.py::RS485Scanner.close`
+
+### From db_connection.py
+- `close_connection` -> `h2_background_service.py::MockScanner.close`
+- `close_connection` -> `h2_background_service.py::RS485Scanner.close`
+- `close_connection` -> `modern_dashboard.py::RS485Scanner.close`
+
+### From db_repository.py
+- `_ensure_offline_alert_table` -> `db_connection.py::get_connection`
+- `_ensure_offline_alert_table` -> `db_schema.py::initialise_schema`
+- `apply_scan_status_flags` -> `db_connection.py::get_connection`
+- `count_all_readings_in_range` -> `db_connection.py::get_connection`
+- `count_distinct_recorded_at_in_range` -> `db_connection.py::get_connection`
+- `count_readings_for_devices_in_range` -> `db_connection.py::get_connection`
+- `count_readings_in_range` -> `db_connection.py::get_connection`
+- `delete_k_factor_rule` -> `db_connection.py::get_connection`
+- `get_all_devices` -> `db_connection.py::get_connection`
+- `get_all_latest_transaction_readings` -> `db_connection.py::get_connection`
+- `get_all_live_cache_latest` -> `db_connection.py::get_connection`
+- `get_all_plants` -> `db_connection.py::get_connection`
+- `get_all_readings_in_range` -> `db_connection.py::get_connection`
+- `get_all_readings_in_range_paged` -> `db_connection.py::get_connection`
+- `get_default_plant_id` -> `db_connection.py::get_connection`
+- `get_device_by_address` -> `db_connection.py::get_connection`
+- `get_device_logs_matrix_page` -> `db_connection.py::get_connection`
+- `get_device_name` -> `db_connection.py::get_connection`
+- `get_k_factor_for_device_address` -> `db_connection.py::get_connection`
+- `get_k_factor_rules` -> `db_connection.py::get_connection`
+- `get_latest_reading` -> `db_connection.py::get_connection`
+- `get_live_cache_recent` -> `db_connection.py::get_connection`
+- `get_live_reading` -> `modern_dashboard.py::get_live_cache_recent`
+- `get_offline_alert_config` -> `db_connection.py::get_connection`
+- `get_readings_for_device` -> `db_connection.py::get_connection`
+- `get_readings_for_devices_in_range` -> `db_connection.py::get_connection`
+- `get_readings_for_devices_in_range_paged` -> `db_connection.py::get_connection`
+- `get_readings_in_range` -> `db_connection.py::get_connection`
+- `get_readings_in_range_paged` -> `db_connection.py::get_connection`
+- `insert_live_cache_reading` -> `db_connection.py::get_connection`
+- `insert_reading` -> `db_connection.py::get_connection`
+- `purge_old_readings` -> `db_connection.py::get_connection`
+- `rename_device` -> `db_connection.py::get_connection`
+- `set_device_status_flag` -> `db_connection.py::get_connection`
+- `update_offline_alert_config` -> `db_connection.py::get_connection`
+- `update_offline_alert_timestamp` -> `db_connection.py::get_connection`
+- `upsert_device` -> `db_connection.py::get_connection`
+- `upsert_k_factor_rule` -> `db_connection.py::get_connection`
+- `upsert_plant` -> `db_connection.py::get_connection`
+
+### From db_schema.py
+- `initialise_schema` -> `db_connection.py::get_connection`
+
+### From h2_background_service.py
+- `BackgroundPollingService._poll_once` -> `alert_manager.py::check_and_fire`
+- `BackgroundPollingService._poll_once` -> `db_repository.py::get_k_factor_for_device_address`
+- `BackgroundPollingService._poll_once` -> `db_repository.py::insert_reading`
+- `BackgroundPollingService._poll_once` -> `db_repository.py::upsert_live_reading`
+- `BackgroundPollingService._poll_once` -> `modern_dashboard.py::MockScanner.poll_device`
+- `BackgroundPollingService._poll_once` -> `modern_dashboard.py::RS485Scanner.poll_device`
+- `BackgroundPollingService._shutdown` -> `modern_dashboard.py::RS485Scanner.close`
+- `BackgroundPollingService._sync_devices_from_scan` -> `alert_manager.py::check_and_fire_offline_alert`
+- `BackgroundPollingService._sync_devices_from_scan` -> `db_repository.py::apply_scan_status_flags`
+- `BackgroundPollingService._sync_devices_from_scan` -> `db_repository.py::get_all_devices`
+- `BackgroundPollingService._sync_devices_from_scan` -> `db_repository.py::get_device_name`
+- `BackgroundPollingService._sync_devices_from_scan` -> `db_repository.py::upsert_device`
+- `BackgroundPollingService._sync_devices_from_scan` -> `modern_dashboard.py::MockScanner.poll_device`
+- `BackgroundPollingService._sync_devices_from_scan` -> `modern_dashboard.py::MockScanner.scan`
+- `BackgroundPollingService._sync_devices_from_scan` -> `modern_dashboard.py::RS485Scanner.poll_device`
+- `BackgroundPollingService._sync_devices_from_scan` -> `modern_dashboard.py::RS485Scanner.scan`
+- `BackgroundPollingService.start` -> `alert_manager.py::init_alert_db`
+- `BackgroundPollingService.start` -> `alert_manager.py::run_pending_scheduled_reports`
+- `BackgroundPollingService.start` -> `db_repository.py::get_default_plant_id`
+- `BackgroundPollingService.start` -> `db_schema.py::initialise_schema`
+- `BackgroundPollingService.start` -> `modern_dashboard.py::RS485Scanner.open`
+- `MockScanner._make_fake_response` -> `modern_dashboard.py::crc16_modbus`
+- `MockScanner.poll_device` -> `modern_dashboard.py::MockScanner._make_fake_response`
+- `MockScanner.poll_device` -> `modern_dashboard.py::parse_device_response`
+- `MockScanner.scan` -> `modern_dashboard.py::ConnectionDialog.on_progress`
+- `MockScanner.scan` -> `modern_dashboard.py::MockScanner._make_fake_response`
+- `MockScanner.scan` -> `modern_dashboard.py::parse_device_response`
+- `RS485Scanner.close` -> `modern_dashboard.py::RS485Scanner.close`
+- `RS485Scanner.poll_device` -> `modern_dashboard.py::build_scan_command`
+- `RS485Scanner.poll_device` -> `modern_dashboard.py::parse_device_response`
+- `RS485Scanner.scan` -> `modern_dashboard.py::ConnectionDialog.on_progress`
+- `RS485Scanner.scan` -> `modern_dashboard.py::build_scan_command`
+- `RS485Scanner.scan` -> `modern_dashboard.py::parse_device_response`
+- `build_scan_command` -> `modern_dashboard.py::crc16_modbus`
+- `main` -> `modern_dashboard.py::PollingEngine.start`
+- `main` -> `modern_dashboard.py::PollingEngine.stop`
+- `parse_device_response` -> `modern_dashboard.py::crc16_modbus`
+
+### From h2_native_windows_service.py
+- `H2BackgroundWindowsService.SvcDoRun` -> `h2_background_service.py::BackgroundPollingService.start`
+- `H2BackgroundWindowsService.SvcDoRun` -> `h2_background_service.py::configure_service_logging`
+- `H2BackgroundWindowsService.SvcDoRun` -> `modern_dashboard.py::PollingEngine.start`
+- `H2BackgroundWindowsService.SvcStop` -> `h2_background_service.py::BackgroundPollingService.stop`
+- `H2BackgroundWindowsService.SvcStop` -> `modern_dashboard.py::PollingEngine.stop`
+- `H2BackgroundWindowsService.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `H2BackgroundWindowsService.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `H2BackgroundWindowsService.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `H2BackgroundWindowsService.__init__` -> `login_window.py::LoginWindow.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::AnalyticsView.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::ConnectionDialog.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::DashboardApp.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::DashboardHeader.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::DashboardView.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::DeviceLogsView.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::HistoricTrendView.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::JournalView.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::MockScanner.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::PollingEngine.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::RS485Scanner.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::SensorCard.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::SettingsView.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::Sidebar.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::TrendGraphView.__init__`
+- `H2BackgroundWindowsService.__init__` -> `modern_dashboard.py::_CalendarPopup.__init__`
+- `_default_service_settings` -> `h2_background_service.py::build_arg_parser`
+- `_load_runtime_settings` -> `modern_dashboard.py::DashboardView.update`
+- `_load_runtime_settings` -> `modern_dashboard.py::SensorCard.update`
+
+### From login_window.py
+- `LoginWindow.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `LoginWindow.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `LoginWindow.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `LoginWindow.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::AnalyticsView.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::ConnectionDialog.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::ConnectionDialog._build`
+- `LoginWindow.__init__` -> `modern_dashboard.py::DashboardApp.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::DashboardHeader.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::DashboardView.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::DeviceLogsView.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::DeviceLogsView._build`
+- `LoginWindow.__init__` -> `modern_dashboard.py::HistoricTrendView.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::HistoricTrendView._build`
+- `LoginWindow.__init__` -> `modern_dashboard.py::JournalView.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::MockScanner.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::PollingEngine.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::RS485Scanner.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::SensorCard.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::SensorCard._build`
+- `LoginWindow.__init__` -> `modern_dashboard.py::SettingsView.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::Sidebar.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::Sidebar._build`
+- `LoginWindow.__init__` -> `modern_dashboard.py::TrendGraphView.__init__`
+- `LoginWindow.__init__` -> `modern_dashboard.py::TrendGraphView._build`
+- `LoginWindow.__init__` -> `modern_dashboard.py::_CalendarPopup.__init__`
+- `LoginWindow._attempt_login` -> `auth.py::authenticate`
+- `LoginWindow._build` -> `auth.py::init_auth_db`
+- `LoginWindow._forgot_password` -> `h2_background_service.py::BackgroundPollingService.start`
+- `LoginWindow._forgot_password` -> `modern_dashboard.py::PollingEngine.start`
+- `LoginWindow._worker` -> `alert_manager.py::get_smtp_config`
+- `LoginWindow._worker` -> `auth.py::reset_user_password_for_recovery`
+- `_logo_image` -> `h2_background_service.py::RS485Scanner.open`
+- `_logo_image` -> `modern_dashboard.py::RS485Scanner.open`
+
+### From modern_dashboard.py
+- `AnalyticsView.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `AnalyticsView.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `AnalyticsView.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `AnalyticsView.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `AnalyticsView.__init__` -> `login_window.py::LoginWindow.__init__`
+- `ConnectionDialog.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `ConnectionDialog.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `ConnectionDialog.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `ConnectionDialog.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `ConnectionDialog.__init__` -> `login_window.py::LoginWindow.__init__`
+- `ConnectionDialog.__init__` -> `login_window.py::LoginWindow._build`
+- `ConnectionDialog._run_scan` -> `h2_background_service.py::MockScanner.scan`
+- `ConnectionDialog._run_scan` -> `h2_background_service.py::RS485Scanner.scan`
+- `ConnectionDialog._start_scan` -> `h2_background_service.py::BackgroundPollingService.start`
+- `ConnectionDialog._start_scan` -> `h2_background_service.py::RS485Scanner.open`
+- `DashboardApp.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `DashboardApp.__init__` -> `h2_background_service.py::BackgroundPollingService.start`
+- `DashboardApp.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `DashboardApp.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `DashboardApp.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `DashboardApp.__init__` -> `login_window.py::LoginWindow.__init__`
+- `DashboardApp._check_device_status_flags` -> `db_repository.py::get_all_devices`
+- `DashboardApp._check_device_status_flags` -> `db_repository.py::get_default_plant_id`
+- `DashboardApp._collect_live_samples` -> `db_repository.py::get_all_latest_transaction_readings`
+- `DashboardApp._collect_live_samples` -> `db_repository.py::get_all_live_cache_latest`
+- `DashboardApp._on_logout` -> `h2_background_service.py::main`
+- `DashboardApp._on_logout` -> `h2_native_windows_service.py::main`
+- `DashboardApp._process_poll` -> `alert_manager.py::check_and_fire`
+- `DashboardApp._process_poll` -> `db_repository.py::get_k_factor_for_device_address`
+- `DashboardApp._process_poll` -> `db_repository.py::insert_reading`
+- `DashboardApp._refresh_from_db` -> `db_repository.py::get_all_devices`
+- `DashboardApp._refresh_from_db` -> `db_repository.py::get_all_latest_transaction_readings`
+- `DashboardApp._refresh_from_db` -> `db_repository.py::get_default_plant_id`
+- `DashboardApp._resolve_total_devices_count` -> `db_repository.py::get_all_devices`
+- `DashboardApp._resolve_total_devices_count` -> `db_repository.py::get_default_plant_id`
+- `DashboardApp._seed_startup_stats` -> `db_repository.py::get_live_cache_recent`
+- `DashboardApp._shutdown_runtime` -> `db_connection.py::close_connection`
+- `DashboardApp._shutdown_runtime` -> `h2_background_service.py::BackgroundPollingService.stop`
+- `DashboardApp._shutdown_runtime` -> `h2_background_service.py::MockScanner.close`
+- `DashboardApp._shutdown_runtime` -> `h2_background_service.py::RS485Scanner.close`
+- `DashboardApp._sync_new_devices_from_db` -> `db_repository.py::get_all_devices`
+- `DashboardApp._sync_new_devices_from_db` -> `db_repository.py::get_default_plant_id`
+- `DashboardApp._sync_new_devices_from_db` -> `db_repository.py::get_latest_reading`
+- `DashboardHeader.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `DashboardHeader.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `DashboardHeader.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `DashboardHeader.__init__` -> `h2_background_service.py::RS485Scanner.open`
+- `DashboardHeader.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `DashboardHeader.__init__` -> `login_window.py::LoginWindow.__init__`
+- `DashboardHeader._resolve_company_location` -> `db_repository.py::get_all_plants`
+- `DashboardView.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `DashboardView.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `DashboardView.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `DashboardView.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `DashboardView.__init__` -> `login_window.py::LoginWindow.__init__`
+- `DeviceLogsView.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `DeviceLogsView.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `DeviceLogsView.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `DeviceLogsView.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `DeviceLogsView.__init__` -> `login_window.py::LoginWindow.__init__`
+- `DeviceLogsView.__init__` -> `login_window.py::LoginWindow._build`
+- `DeviceLogsView._export_csv` -> `h2_background_service.py::RS485Scanner.open`
+- `DeviceLogsView._export_pdf` -> `alert_manager.py::build_device_logs_report_pdf_bytes`
+- `DeviceLogsView._export_pdf` -> `h2_background_service.py::RS485Scanner.open`
+- `DeviceLogsView._fetch` -> `db_repository.py::get_device_by_address`
+- `DeviceLogsView._get_export_rows` -> `db_repository.py::get_all_readings_in_range`
+- `DeviceLogsView._get_export_rows` -> `db_repository.py::get_device_by_address`
+- `DeviceLogsView._get_export_rows` -> `db_repository.py::get_readings_for_devices_in_range`
+- `DeviceLogsView._get_export_rows` -> `db_repository.py::get_readings_in_range`
+- `DeviceLogsView._load_page` -> `db_repository.py::get_device_logs_matrix_page`
+- `DeviceLogsView._update_total` -> `db_repository.py::count_distinct_recorded_at_in_range`
+- `HistoricTrendView.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `HistoricTrendView.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `HistoricTrendView.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `HistoricTrendView.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `HistoricTrendView.__init__` -> `login_window.py::LoginWindow.__init__`
+- `HistoricTrendView.__init__` -> `login_window.py::LoginWindow._build`
+- `HistoricTrendView._export_pdf` -> `db_repository.py::get_all_plants`
+- `HistoricTrendView._fetch` -> `db_repository.py::get_all_readings_in_range`
+- `HistoricTrendView._fetch` -> `db_repository.py::get_device_by_address`
+- `HistoricTrendView._fetch` -> `db_repository.py::get_readings_for_devices_in_range`
+- `HistoricTrendView._fetch` -> `db_repository.py::get_readings_in_range`
+- `JournalView.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `JournalView.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `JournalView.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `JournalView.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `JournalView.__init__` -> `login_window.py::LoginWindow.__init__`
+- `JournalView.refresh` -> `alert_manager.py::get_journal`
+- `MockScanner._make_fake_response` -> `h2_background_service.py::crc16_modbus`
+- `MockScanner.poll_device` -> `h2_background_service.py::MockScanner._make_fake_response`
+- `MockScanner.poll_device` -> `h2_background_service.py::parse_device_response`
+- `MockScanner.scan` -> `h2_background_service.py::MockScanner._make_fake_response`
+- `MockScanner.scan` -> `h2_background_service.py::parse_device_response`
+- `PollingEngine._loop` -> `h2_background_service.py::MockScanner.poll_device`
+- `PollingEngine._loop` -> `h2_background_service.py::RS485Scanner.poll_device`
+- `PollingEngine.start` -> `h2_background_service.py::BackgroundPollingService.start`
+- `RS485Scanner.close` -> `h2_background_service.py::MockScanner.close`
+- `RS485Scanner.close` -> `h2_background_service.py::RS485Scanner.close`
+- `RS485Scanner.poll_device` -> `h2_background_service.py::build_scan_command`
+- `RS485Scanner.poll_device` -> `h2_background_service.py::parse_device_response`
+- `RS485Scanner.scan` -> `h2_background_service.py::build_scan_command`
+- `RS485Scanner.scan` -> `h2_background_service.py::parse_device_response`
+- `SensorCard.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `SensorCard.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `SensorCard.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `SensorCard.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `SensorCard.__init__` -> `login_window.py::LoginWindow.__init__`
+- `SensorCard.__init__` -> `login_window.py::LoginWindow._build`
+- `SensorCard._confirm_name_edit` -> `alert_manager.py::log_journal`
+- `SensorCard._confirm_name_edit` -> `db_repository.py::rename_device`
+- `SettingsView.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `SettingsView.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `SettingsView.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `SettingsView.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `SettingsView.__init__` -> `login_window.py::LoginWindow.__init__`
+- `SettingsView._add_alert_entry` -> `alert_manager.py::add_alert`
+- `SettingsView._add_k_factor_rule` -> `alert_manager.py::log_journal`
+- `SettingsView._add_k_factor_rule` -> `db_repository.py::upsert_k_factor_rule`
+- `SettingsView._add_report_event` -> `alert_manager.py::add_report_scheduler`
+- `SettingsView._apply` -> `alert_manager.py::log_journal`
+- `SettingsView._build_general` -> `alert_manager.py::get_smtp_config`
+- `SettingsView._delete_email` -> `alert_manager.py::delete_alert_email`
+- `SettingsView._delete_report_email` -> `alert_manager.py::delete_report_scheduler_email`
+- `SettingsView._delete_report_event` -> `alert_manager.py::delete_report_scheduler`
+- `SettingsView._delete_rule` -> `alert_manager.py::delete_alert_rule`
+- `SettingsView._delete_user` -> `alert_manager.py::log_journal`
+- `SettingsView._on_occ_change` -> `alert_manager.py::update_rule_occurrence`
+- `SettingsView._open_add_report_mail_dialog` -> `alert_manager.py::add_report_scheduler_email`
+- `SettingsView._refresh_alert_list` -> `alert_manager.py::get_alert_rules`
+- `SettingsView._refresh_k_factor_device_options` -> `db_repository.py::get_all_devices`
+- `SettingsView._refresh_k_factor_rules` -> `db_repository.py::get_k_factor_rules`
+- `SettingsView._refresh_offline_alert_config` -> `db_repository.py::get_offline_alert_config`
+- `SettingsView._refresh_report_event_list` -> `alert_manager.py::get_report_schedulers`
+- `SettingsView._refresh_user_list` -> `auth.py::list_users`
+- `SettingsView._save` -> `alert_manager.py::log_journal`
+- `SettingsView._save` -> `auth.py::change_password`
+- `SettingsView._save` -> `auth.py::create_user`
+- `SettingsView._save` -> `auth.py::update_user`
+- `SettingsView._save_offline_alert_config` -> `alert_manager.py::log_journal`
+- `SettingsView._save_offline_alert_config` -> `db_repository.py::get_offline_alert_config`
+- `SettingsView._save_offline_alert_config` -> `db_repository.py::update_offline_alert_config`
+- `SettingsView._save_rule` -> `alert_manager.py::log_journal`
+- `SettingsView._save_rule` -> `db_repository.py::upsert_k_factor_rule`
+- `SettingsView._save_smtp` -> `alert_manager.py::save_smtp_config`
+- `SettingsView._test_report_send` -> `alert_manager.py::_valid_email`
+- `SettingsView._test_report_send` -> `alert_manager.py::build_device_logs_report_pdf_bytes`
+- `SettingsView._test_report_send` -> `alert_manager.py::get_smtp_config`
+- `SettingsView._test_report_send` -> `alert_manager.py::log_journal`
+- `SettingsView._test_report_send` -> `db_repository.py::get_all_live_readings`
+- `SettingsView._test_smtp` -> `h2_background_service.py::BackgroundPollingService.start`
+- `Sidebar.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `Sidebar.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `Sidebar.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `Sidebar.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `Sidebar.__init__` -> `login_window.py::LoginWindow.__init__`
+- `Sidebar.__init__` -> `login_window.py::LoginWindow._build`
+- `TrendGraphView.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `TrendGraphView.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `TrendGraphView.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `TrendGraphView.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `TrendGraphView.__init__` -> `login_window.py::LoginWindow.__init__`
+- `TrendGraphView.__init__` -> `login_window.py::LoginWindow._build`
+- `_CalendarPopup.__init__` -> `h2_background_service.py::BackgroundPollingService.__init__`
+- `_CalendarPopup.__init__` -> `h2_background_service.py::MockScanner.__init__`
+- `_CalendarPopup.__init__` -> `h2_background_service.py::RS485Scanner.__init__`
+- `_CalendarPopup.__init__` -> `h2_native_windows_service.py::H2BackgroundWindowsService.__init__`
+- `_CalendarPopup.__init__` -> `login_window.py::LoginWindow.__init__`
+- `_load_icon_from_assets` -> `h2_background_service.py::RS485Scanner.open`
+- `build_scan_command` -> `h2_background_service.py::crc16_modbus`
+- `get_live_cache_recent` -> `db_repository.py::get_live_reading`
+- `load_devices_from_db` -> `db_repository.py::get_all_devices`
+- `load_devices_from_db` -> `db_repository.py::get_default_plant_id`
+- `load_devices_from_db` -> `db_repository.py::get_latest_reading`
+- `load_devices_from_db` -> `db_schema.py::initialise_schema`
+- `main` -> `db_schema.py::initialise_schema`
+- `parse_device_response` -> `h2_background_service.py::crc16_modbus`
+
+## Program Flow (High-Level)
+
+Based on file roles and discovered entrypoints:
+
+1. `modern_dashboard.py` starts desktop UI and drives views/settings/report exports.
+2. `h2_background_service.py` handles device scanning/polling, DB writes, and alert checks.
+3. `h2_native_windows_service.py` hosts background logic as a native Windows service wrapper.
+4. `db_connection.py`, `db_schema.py`, `db_repository.py` provide persistence and query layer.
+5. `alert_manager.py` applies threshold/offline email alert logic and report mailing.
+6. `auth.py` and `login_window.py` handle identity/auth UI paths into the dashboard.
+
+## Detected Entrypoint-Like Functions
+
+- `h2_background_service.py::BackgroundPollingService.start`
+- `h2_background_service.py::main`
+- `h2_native_windows_service.py::main`
+- `modern_dashboard.py::PollingEngine.start`
+- `modern_dashboard.py::main`
+
+## Notes
+
+- This is static metadata; dynamic dispatch, callbacks, and threading/event-loop paths are approximated.
+- For precise runtime flow, pair this with logging traces from the background service and dashboard sessions.

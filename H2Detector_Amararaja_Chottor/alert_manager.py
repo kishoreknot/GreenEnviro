@@ -1365,14 +1365,15 @@ def build_device_logs_report_pdf_bytes(
         except Exception:
             continue
 
-    # Summary from the same aggregated values shown in Detail.
+    # Summary from raw rows
+    values_by_name: dict[str, list[float]] = {name: [] for name in device_names}
+    for row in norm_rows:
+        if row["device_name"] in values_by_name:
+            values_by_name[row["device_name"]].append(float(row["concentration_value"]))
+
     summary_rows: list[list[str]] = []
     for name in device_names:
-        vals: list[float] = []
-        for ts in timestamps:
-            val = pivot.get(ts, {}).get(name)
-            if isinstance(val, (int, float)):
-                vals.append(float(val))
+        vals = values_by_name.get(name, [])
         unit = device_units.get(name, "ppm")
         if vals:
             mn = min(vals)
@@ -1588,11 +1589,11 @@ def _build_device_logs_report_xlsx_bytes(
 
     summary_rows: list[list[object]] = []
     for name in device_names:
-        vals: list[float] = []
-        for ts in timestamps:
-            val = pivot.get(ts, {}).get(name)
-            if isinstance(val, (int, float)):
-                vals.append(float(val))
+        vals = [
+            float(row.get("concentration_value") or 0.0)
+            for row in norm_rows
+            if row["device_name"] == name
+        ]
         unit = device_units.get(name, "ppm")
         if vals:
             mn = min(vals)
@@ -1650,7 +1651,7 @@ def _build_device_logs_report_xlsx_bytes(
         pd.DataFrame(meta_rows, columns=["Field", "Value"]).to_excel(
             writer, index=False, sheet_name=workbook_sheet, startrow=1)
 
-        summary_start = len(meta_rows) + 4
+        summary_start = len(meta_rows) + 3
         pd.DataFrame([['Summary']]).to_excel(
             writer, index=False, header=False, sheet_name=workbook_sheet, startrow=summary_start - 1)
         pd.DataFrame(summary_rows, columns=["Device", "Units", "Min", "Max", "Average"]).to_excel(
